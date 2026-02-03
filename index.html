@@ -2,119 +2,91 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>מעמד ספרים מקצועי v3</title>
+    <title>מעמד ספרים מקצועי - תיקון הורדה</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
     <style>
-        :root { --bg: #f0f2f5; --sidebar: #1e272e; --primary: #05c46b; --h1-col: #3c40c6; --h2-col: #f53b57; }
-        body { font-family: 'Segoe UI', system-ui; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
-        
-        /* Sidebar & Navigation */
-        .sidebar { width: 400px; background: var(--sidebar); color: white; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.3); }
-        .sidebar h2 { text-align: center; border-bottom: 2px solid #3d4e5e; padding-bottom: 10px; margin-top: 0; }
-        
-        /* Rules UI */
-        .rule-card { background: #2f3640; border-radius: 10px; padding: 15px; margin-bottom: 20px; border-right: 6px solid var(--primary); }
-        .rule-card.h2-card { border-right-color: var(--h2-col); }
-        .rule-card h3 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
-        
-        .condition-group { background: #3d4e5e; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px dashed #7f8c8d; }
-        .condition-group h4 { margin: 0 0 8px 0; font-size: 0.9rem; color: #dcdde1; }
-        
-        .row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.85rem; }
-        .row input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
-        .row input[type="text"], .row input[type="number"] { flex: 1; padding: 4px; border-radius: 4px; border: none; }
-        .solo-badge { font-size: 0.7rem; background: #0fbcf9; padding: 2px 5px; border-radius: 3px; cursor: help; }
-
-        /* Main Viewport */
-        .viewport { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-        .paper { 
-            background: white; width: 100%; max-width: 850px; 
-            min-height: 100%; padding: 60px; box-shadow: 0 0 30px rgba(0,0,0,0.1);
-            display: table; /* גורם לרקע להימתח עם התוכן */
-        }
-
-        /* Preview Styles */
-        .p-view { margin: 10px 0; padding: 5px; transition: 0.2s; border-radius: 4px; }
-        .h1-view { font-size: 2em; font-weight: bold; color: var(--h1-col); background: #eef2ff; border: 1px solid var(--h1-col); text-align: center; }
-        .h2-view { font-size: 1.5em; font-weight: bold; color: var(--h2-col); background: #fff5f5; border: 1px solid var(--h2-col); text-align: center; }
-        .centered { text-align: center; }
-
-        .btn { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; margin-top: 10px; width: 100%; }
-        .btn-update { background: #05c46b; }
-        .btn-download { background: #f0932b; }
-        .btn:hover { filter: brightness(1.1); }
-        #status { font-size: 0.8rem; margin-bottom: 10px; text-align: center; }
+        :root { --sidebar: #2c3e50; --bg: #f5f6fa; --primary: #27ae60; --h1: #2980b9; --h2: #e67e22; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
+        .sidebar { width: 420px; background: var(--sidebar); color: white; padding: 20px; overflow-y: auto; box-shadow: 4px 0 10px rgba(0,0,0,0.3); z-index: 10; }
+        .rule-card { background: #34495e; border-radius: 12px; padding: 15px; margin-bottom: 20px; border-right: 6px solid var(--primary); }
+        .rule-card.h2-card { border-right-color: var(--h2); }
+        .group-box { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-top: 10px; }
+        .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.9rem; }
+        input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; }
+        input[type="text"], input[type="number"] { flex: 1; padding: 5px; border-radius: 4px; border: none; }
+        .viewport { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+        .paper { background: white; width: 100%; max-width: 800px; min-height: 100%; padding: 60px; box-shadow: 0 0 20px rgba(0,0,0,0.1); box-sizing: border-box; word-wrap: break-word; }
+        .h1-style { font-size: 2em; font-weight: bold; color: var(--h1); text-align: center; background: #e3f2fd; border: 2px solid var(--h1); margin: 25px 0; padding: 10px; }
+        .h2-style { font-size: 1.5em; font-weight: bold; color: var(--h2); text-align: center; background: #fff3e0; border: 2px dashed var(--h2); margin: 15px 0; padding: 8px; }
+        .center-text { text-align: center; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; margin-top: 10px; }
+        #status-bar { text-align: center; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-weight: bold; }
+        .ready { background: #27ae60; color: white; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>מעמד ספרים מקצועי</h2>
-    <div id="status">טוען מערכת...</div>
-    <input type="file" id="filePicker" accept=".docx" style="margin-bottom: 20px;">
+    <h2>מעמד ספרים חכם</h2>
+    <div id="status-bar">בודק חיבור...</div>
+    <input type="file" id="fileIn" accept=".docx" style="margin-bottom: 20px;">
 
     <div id="ui" style="display:none;">
         <div class="rule-card">
-            <h3>כותרת 1 (רמה א')</h3>
-            <div class="row">
-                <input type="checkbox" id="h1_double_en"> <span>חוק רצף:</span>
-                <input type="text" id="h1_double_val" value="סימן" placeholder="מילת מפתח">
-            </div>
-            <div class="condition-group">
-                <h4>קבוצת תנאים (AND):</h4>
-                <div class="row"><input type="checkbox" id="h1_b"> <span>מודגש</span> <span class="solo-badge" title="הפעל כתנאי עצמאי">סולו?</span> <input type="checkbox" id="h1_b_s"></div>
-                <div class="row"><input type="checkbox" id="h1_c"> <span>ממורכז</span> <span class="solo-badge">סולו?</span> <input type="checkbox" id="h1_c_s"></div>
-                <div class="row"><input type="checkbox" id="h1_w"> <span>פחות מ-</span> <input type="number" id="h1_wv" value="5" style="width:50px;"> <span>מילים</span></div>
+            <h3>כותרת 1 (H1)</h3>
+            <div class="row"><input type="checkbox" id="h1_double"> <span>רצף מילים:</span> <input type="text" id="h1_double_val" value="סימן" style="width:60px;"></div>
+            <div class="group-box">
+                <div class="row"><input type="checkbox" id="h1_b"> <span>מודגש</span> <input type="checkbox" id="h1_b_s"> <small>סולו</small></div>
+                <div class="row"><input type="checkbox" id="h1_c"> <span>ממורכז</span> <input type="checkbox" id="h1_c_s"> <small>סולו</small></div>
+                <div class="row"><input type="checkbox" id="h1_w"> <span>קצר מ-</span> <input type="number" id="h1_wv" value="5" style="width:40px;"></div>
             </div>
         </div>
-
         <div class="rule-card h2-card">
-            <h3>כותרת 2 (רמה ב')</h3>
-            <div class="condition-group">
-                <h4>קבוצת תנאים (AND):</h4>
-                <div class="row"><input type="checkbox" id="h2_b"> <span>מודגש</span> <span class="solo-badge">סולו?</span> <input type="checkbox" id="h2_b_s"></div>
-                <div class="row"><input type="checkbox" id="h2_c"> <span>ממורכז</span> <span class="solo-badge">סולו?</span> <input type="checkbox" id="h2_c_s"></div>
-                <div class="row"><input type="checkbox" id="h2_w" checked> <span>פחות מ-</span> <input type="number" id="h2_wv" value="6" style="width:50px;"> <span>מילים</span></div>
+            <h3>כותרת 2 (H2)</h3>
+            <div class="group-box">
+                <div class="row"><input type="checkbox" id="h2_b"> <span>מודגש</span> <input type="checkbox" id="h2_b_s"> <small>סולו</small></div>
+                <div class="row"><input type="checkbox" id="h2_c"> <span>ממורכז</span> <input type="checkbox" id="h2_c_s"> <small>סולו</small></div>
+                <div class="row"><input type="checkbox" id="h2_w" checked> <span>קצר מ-</span> <input type="number" id="h2_wv" value="6" style="width:40px;"></div>
             </div>
         </div>
-
-        <button class="btn btn-update" onclick="runLogic()">עדכן תצוגה</button>
-        <button class="btn btn-download" onclick="exportFile()">שמור קובץ .docx</button>
+        <button class="btn" style="background:#27ae60" onclick="updateView()">עדכן תצוגה</button>
+        <button class="btn" style="background:#e67e22" onclick="downloadDoc()">הורד קובץ מתוקן</button>
     </div>
 </div>
 
 <div class="viewport">
-    <div class="paper" id="output">
-        <div style="text-align: center; color: #bdc3c7; margin-top: 100px;">העלה קובץ וורד כדי להתחיל בעימוד...</div>
-    </div>
+    <div class="paper" id="contentArea"></div>
 </div>
 
 <script>
     let zip = null;
     let paragraphs = [];
 
-    window.onload = () => {
-        if (typeof PizZip !== 'undefined') document.getElementById('status').innerText = "מערכת מוכנה";
-    };
+    // וידוא טעינה
+    setInterval(() => {
+        const bar = document.getElementById('status-bar');
+        if (typeof PizZip !== 'undefined' && (typeof saveAs !== 'undefined' || typeof window.saveAs !== 'undefined')) {
+            bar.innerText = "המערכת מוכנה!"; bar.className = "ready";
+        } else {
+            bar.innerText = "טוען ספריות..."; bar.style.background = "#f1c40f";
+        }
+    }, 500);
 
-    document.getElementById('filePicker').onchange = (e) => {
+    document.getElementById('fileIn').onchange = (e) => {
         const reader = new FileReader();
         reader.onload = (ev) => {
             zip = new PizZip(ev.target.result);
-            const xml = zip.file("word/document.xml").asText();
-            const doc = new DOMParser().parseFromString(xml, "application/xml");
-            const ps = Array.from(doc.getElementsByTagNameNS("*", "p"));
-
-            paragraphs = ps.map(p => {
-                const text = Array.from(p.getElementsByTagNameNS("*", "t")).map(t => t.textContent).join("").trim();
-                const isB = p.getElementsByTagNameNS("*", "b").length > 0;
-                const isC = p.getElementsByTagNameNS("*", "jc")[0]?.getAttribute("w:val") === "center";
-                return { text, isB, isC, el: p };
+            const doc = new DOMParser().parseFromString(zip.file("word/document.xml").asText(), "application/xml");
+            paragraphs = Array.from(doc.getElementsByTagNameNS("*", "p")).map(p => {
+                return {
+                    text: Array.from(p.getElementsByTagNameNS("*", "t")).map(t => t.textContent).join("").trim(),
+                    isB: p.getElementsByTagNameNS("*", "b").length > 0,
+                    isC: p.getElementsByTagNameNS("*", "jc")[0]?.getAttribute("w:val") === "center"
+                };
             }).filter(p => p.text.length > 0);
-
             document.getElementById('ui').style.display = 'block';
-            runLogic();
+            updateView();
         };
         reader.readAsArrayBuffer(e.target.files[0]);
     };
@@ -123,69 +95,49 @@
         const b = document.getElementById(`${prefix}_b`).checked && p.isB;
         const c = document.getElementById(`${prefix}_c`).checked && p.isC;
         const w = document.getElementById(`${prefix}_w`).checked && p.text.split(/\s+/).length <= parseInt(document.getElementById(`${prefix}_wv`).value);
-        
-        // Solo triggers
         if (document.getElementById(`${prefix}_b_s`)?.checked && b) return true;
         if (document.getElementById(`${prefix}_c_s`)?.checked && c) return true;
-
-        // Group (AND)
-        let group = [];
-        if (document.getElementById(`${prefix}_b`).checked && !document.getElementById(`${prefix}_b_s`)?.checked) group.push(b);
-        if (document.getElementById(`${prefix}_c`).checked && !document.getElementById(`${prefix}_c_s`)?.checked) group.push(c);
-        if (document.getElementById(`${prefix}_w`).checked) group.push(w);
-
-        if (group.length > 0 && group.every(v => v)) return true;
-
-        // Double check (H1 specific)
-        if (prefix === 'h1' && document.getElementById('h1_double_en').checked) {
-            const key = document.getElementById('h1_double_val').value;
-            if (p.text.startsWith(key) && next?.text.startsWith(key)) return true;
+        let g = [];
+        if (document.getElementById(`${prefix}_b`).checked && !document.getElementById(`${prefix}_b_s`)?.checked) g.push(b);
+        if (document.getElementById(`${prefix}_c`).checked && !document.getElementById(`${prefix}_c_s`)?.checked) g.push(c);
+        if (document.getElementById(`${prefix}_w`).checked) g.push(w);
+        if (g.length > 0 && g.every(v => v)) return true;
+        if (prefix === 'h1' && document.getElementById('h1_double').checked) {
+            const val = document.getElementById('h1_double_val').value;
+            if (p.text.startsWith(val) && next?.text.startsWith(val)) return true;
         }
-
         return false;
     }
 
-    function runLogic() {
-        const out = document.getElementById('output');
-        out.innerHTML = '';
+    function updateView() {
+        const area = document.getElementById('contentArea');
+        area.innerHTML = '';
         paragraphs.forEach((p, i) => {
-            let role = null;
-            if (evaluate(p, paragraphs[i+1], 'h1')) role = 'h1';
-            else if (evaluate(p, paragraphs[i+1], 'h2')) role = 'h2';
-
-            p.role = role;
+            p.role = evaluate(p, paragraphs[i+1], 'h1') ? 'h1' : (evaluate(p, paragraphs[i+1], 'h2') ? 'h2' : null);
             const div = document.createElement('div');
-            div.className = 'p-view';
+            div.className = 'p-preview' + (p.role ? ' ' + p.role + '-style' : '') + (p.isC ? ' center-text' : '');
             div.innerText = p.text;
-            if (role === 'h1') div.classList.add('h1-view');
-            if (role === 'h2') div.classList.add('h2-view');
-            if (p.isC) div.classList.add('centered');
-            out.appendChild(div);
+            area.appendChild(div);
         });
     }
 
-    function exportFile() {
+    function downloadDoc() {
         try {
             const xml = zip.file("word/document.xml").asText();
-            const doc = new DOMParser().parseFromString(xml, "application/xml");
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xml, "application/xml");
             const ps = Array.from(doc.getElementsByTagNameNS("*", "p"));
+            const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 
             let idx = 0;
             ps.forEach(p => {
                 if (p.textContent.trim().length > 0 && paragraphs[idx]) {
                     const role = paragraphs[idx].role;
                     if (role) {
-                        const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-                        let pPr = p.getElementsByTagNameNS(ns, "pPr")[0];
-                        if (!pPr) {
-                            pPr = doc.createElementNS(ns, "w:pPr");
-                            p.insertBefore(pPr, p.firstChild);
-                        }
-                        let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0];
-                        if (!style) {
-                            style = doc.createElementNS(ns, "w:pStyle");
-                            pPr.appendChild(style);
-                        }
+                        let pPr = p.getElementsByTagNameNS(ns, "pPr")[0] || doc.createElementNS(ns, "w:pPr");
+                        if (!p.contains(pPr)) p.insertBefore(pPr, p.firstChild);
+                        let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0] || doc.createElementNS(ns, "w:pStyle");
+                        if (!pPr.contains(style)) pPr.appendChild(style);
                         style.setAttributeNS(ns, "w:val", role === 'h1' ? "Heading1" : "Heading2");
                     }
                     idx++;
@@ -193,11 +145,17 @@
             });
 
             zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
-            const blob = zip.generate({type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
-            saveAs(blob, "ספר_מעומד.docx");
-        } catch (e) {
-            alert("שגיאה ביצירת הקובץ: " + e.message);
-        }
+            const out = zip.generate({type:"blob", mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+            
+            // שימוש בשיטה הבטוחה ביותר להורדה
+            if (window.saveAs) window.saveAs(out, "מעמד_ספר.docx");
+            else if (typeof saveAs !== 'undefined') saveAs(out, "מעמד_ספר.docx");
+            else {
+                const url = window.URL.createObjectURL(out);
+                const a = document.createElement('a');
+                a.href = url; a.download = "מעמד_ספר.docx"; a.click();
+            }
+        } catch(e) { alert("שגיאה סופית: " + e.message); }
     }
 </script>
 </body>
