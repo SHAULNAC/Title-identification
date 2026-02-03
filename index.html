@@ -2,211 +2,202 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>מעמד ספרים מקצועי - גרסת הלוגיקה המלאה</title>
+    <title>מעמד ספרים מקצועי v3</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
-    
     <style>
-        :root { --sidebar-width: 380px; --primary: #1abc9c; --accent: #e67e22; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: #dcdde1; overflow: hidden; }
+        :root { --bg: #f0f2f5; --sidebar: #1e272e; --primary: #05c46b; --h1-col: #3c40c6; --h2-col: #f53b57; }
+        body { font-family: 'Segoe UI', system-ui; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
         
-        /* תפריט צד */
-        .sidebar { width: var(--sidebar-width); background: #2c3e50; color: white; padding: 20px; overflow-y: auto; box-shadow: 2px 0 10px rgba(0,0,0,0.3); }
-        .sidebar h2 { border-bottom: 1px solid #555; padding-bottom: 10px; font-size: 1.2rem; margin-top: 0; }
+        /* Sidebar & Navigation */
+        .sidebar { width: 400px; background: var(--sidebar); color: white; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; box-shadow: 4px 0 10px rgba(0,0,0,0.3); }
+        .sidebar h2 { text-align: center; border-bottom: 2px solid #3d4e5e; padding-bottom: 10px; margin-top: 0; }
         
-        /* מערכות חוקים */
-        .rule-system { background: #34495e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-right: 5px solid var(--primary); }
-        .rule-system.h2-system { border-right-color: #c0392b; }
-        .rule-system h3 { margin: 0 0 10px 0; font-size: 1rem; color: #ecf0f1; }
+        /* Rules UI */
+        .rule-card { background: #2f3640; border-radius: 10px; padding: 15px; margin-bottom: 20px; border-right: 6px solid var(--primary); }
+        .rule-card.h2-card { border-right-color: var(--h2-col); }
+        .rule-card h3 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
         
-        .condition-row { display: grid; grid-template-columns: 25px 1fr 80px; align-items: center; gap: 5px; margin-bottom: 8px; font-size: 0.85rem; }
-        .condition-row input[type="text"], .condition-row input[type="number"] { width: 100%; padding: 4px; border-radius: 3px; border: none; }
+        .condition-group { background: #3d4e5e; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px dashed #7f8c8d; }
+        .condition-group h4 { margin: 0 0 8px 0; font-size: 0.9rem; color: #dcdde1; }
         
-        /* אזור תצוגה מקדימה - תיקון הגלילה */
-        .main-view { flex: 1; display: flex; justify-content: center; overflow-y: auto; padding: 40px 20px; scroll-behavior: smooth; }
-        .paper-sheet { 
-            width: 100%; max-width: 800px; background: white; min-height: 100%; 
-            padding: 50px; box-shadow: 0 0 20px rgba(0,0,0,0.15); border-radius: 4px;
-            box-sizing: border-box; position: relative;
+        .row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.85rem; }
+        .row input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        .row input[type="text"], .row input[type="number"] { flex: 1; padding: 4px; border-radius: 4px; border: none; }
+        .solo-badge { font-size: 0.7rem; background: #0fbcf9; padding: 2px 5px; border-radius: 3px; cursor: help; }
+
+        /* Main Viewport */
+        .viewport { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        .paper { 
+            background: white; width: 100%; max-width: 850px; 
+            min-height: 100%; padding: 60px; box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            display: table; /* גורם לרקע להימתח עם התוכן */
         }
 
-        /* עיצוב כותרות בתצוגה */
-        .p-preview { margin: 8px 0; padding: 4px; border-radius: 3px; border: 1px solid transparent; }
-        .h1-style { font-size: 1.8em; font-weight: bold; color: #2980b9; background: #ebf5fb; border: 1px dashed #2980b9; }
-        .h2-style { font-size: 1.4em; font-weight: bold; color: #c0392b; background: #fdedec; border: 1px dashed #c0392b; }
-        .center-text { text-align: center; }
+        /* Preview Styles */
+        .p-view { margin: 10px 0; padding: 5px; transition: 0.2s; border-radius: 4px; }
+        .h1-view { font-size: 2em; font-weight: bold; color: var(--h1-col); background: #eef2ff; border: 1px solid var(--h1-col); text-align: center; }
+        .h2-view { font-size: 1.5em; font-weight: bold; color: var(--h2-col); background: #fff5f5; border: 1px solid var(--h2-col); text-align: center; }
+        .centered { text-align: center; }
 
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; margin-top: 10px; transition: 0.2s; }
-        .btn-update { background: var(--primary); }
-        .btn-download { background: var(--accent); }
-        .status-ready { color: #2ecc71; font-weight: bold; margin-bottom: 10px; display: block; }
-        small { font-size: 0.75rem; color: #bdc3c7; }
+        .btn { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; margin-top: 10px; width: 100%; }
+        .btn-update { background: #05c46b; }
+        .btn-download { background: #f0932b; }
+        .btn:hover { filter: brightness(1.1); }
+        #status { font-size: 0.8rem; margin-bottom: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>הגדרות עימוד</h2>
-    <span id="lib-status" style="color: #f1c40f;">טוען ספריות...</span>
-    
-    <input type="file" id="fileInput" accept=".docx" style="margin: 15px 0;">
+    <h2>מעמד ספרים מקצועי</h2>
+    <div id="status">טוען מערכת...</div>
+    <input type="file" id="filePicker" accept=".docx" style="margin-bottom: 20px;">
 
-    <div id="ui-controls" style="display:none;">
-        <div class="rule-system">
-            <h3>מערכת כותרת 1 (H1)</h3>
-            <div class="condition-row">
-                <input type="checkbox" id="h1_double_check">
-                <span>ראשון מ-2 שמתחילים ב:</span>
-                <input type="text" id="h1_double_val" value="סימן">
+    <div id="ui" style="display:none;">
+        <div class="rule-card">
+            <h3>כותרת 1 (רמה א')</h3>
+            <div class="row">
+                <input type="checkbox" id="h1_double_en"> <span>חוק רצף:</span>
+                <input type="text" id="h1_double_val" value="סימן" placeholder="מילת מפתח">
             </div>
-            <div class="condition-row">
-                <input type="checkbox" id="h1_center_check"> <span>ממורכז</span> <small>לבד?</small>
-                <input type="checkbox" id="h1_center_only">
-            </div>
-            <div class="condition-row">
-                <input type="checkbox" id="h1_bold_check"> <span>מודגש (Bold)</span> <small>לבד?</small>
-                <input type="checkbox" id="h1_bold_only">
-            </div>
-            <div class="condition-row">
-                <input type="checkbox" id="h1_words_check"> <span>קצר מ-</span> 
-                <input type="number" id="h1_words_val" value="5">
+            <div class="condition-group">
+                <h4>קבוצת תנאים (AND):</h4>
+                <div class="row"><input type="checkbox" id="h1_b"> <span>מודגש</span> <span class="solo-badge" title="הפעל כתנאי עצמאי">סולו?</span> <input type="checkbox" id="h1_b_s"></div>
+                <div class="row"><input type="checkbox" id="h1_c"> <span>ממורכז</span> <span class="solo-badge">סולו?</span> <input type="checkbox" id="h1_c_s"></div>
+                <div class="row"><input type="checkbox" id="h1_w"> <span>פחות מ-</span> <input type="number" id="h1_wv" value="5" style="width:50px;"> <span>מילים</span></div>
             </div>
         </div>
 
-        <div class="rule-system h2-system">
-            <h3>מערכת כותרת 2 (H2)</h3>
-            <div class="condition-row">
-                <input type="checkbox" id="h2_center_check"> <span>ממורכז</span> <small>לבד?</small>
-                <input type="checkbox" id="h2_center_only">
-            </div>
-            <div class="condition-row">
-                <input type="checkbox" id="h2_bold_check"> <span>מודגש (Bold)</span> <small>לבד?</small>
-                <input type="checkbox" id="h2_bold_only">
-            </div>
-            <div class="condition-row">
-                <input type="checkbox" id="h2_words_check"> <span>קצר מ-</span> 
-                <input type="number" id="h2_words_val" value="6">
+        <div class="rule-card h2-card">
+            <h3>כותרת 2 (רמה ב')</h3>
+            <div class="condition-group">
+                <h4>קבוצת תנאים (AND):</h4>
+                <div class="row"><input type="checkbox" id="h2_b"> <span>מודגש</span> <span class="solo-badge">סולו?</span> <input type="checkbox" id="h2_b_s"></div>
+                <div class="row"><input type="checkbox" id="h2_c"> <span>ממורכז</span> <span class="solo-badge">סולו?</span> <input type="checkbox" id="h2_c_s"></div>
+                <div class="row"><input type="checkbox" id="h2_w" checked> <span>פחות מ-</span> <input type="number" id="h2_wv" value="6" style="width:50px;"> <span>מילים</span></div>
             </div>
         </div>
 
-        <button class="btn btn-update" onclick="applyRules()">עדכן תצוגה מקדימה</button>
-        <button class="btn btn-download" onclick="exportDoc()">הורד קובץ מעומד</button>
+        <button class="btn btn-update" onclick="runLogic()">עדכן תצוגה</button>
+        <button class="btn btn-download" onclick="exportFile()">שמור קובץ .docx</button>
     </div>
 </div>
 
-<div class="main-view">
-    <div class="paper-sheet" id="previewContainer">
-        <p style="text-align: center; color: #95a5a6; margin-top: 50px;">העלה קובץ כדי לראות תצוגה מקדימה...</p>
+<div class="viewport">
+    <div class="paper" id="output">
+        <div style="text-align: center; color: #bdc3c7; margin-top: 100px;">העלה קובץ וורד כדי להתחיל בעימוד...</div>
     </div>
 </div>
 
 <script>
-    let zipObj = null;
-    let data = [];
+    let zip = null;
+    let paragraphs = [];
 
-    // בדיקת טעינת ספריות
-    const timer = setInterval(() => {
-        if (window.PizZip) {
-            document.getElementById('lib-status').innerText = "ספריות מוכנות!";
-            document.getElementById('lib-status').className = "status-ready";
-            clearInterval(timer);
-        }
-    }, 500);
+    window.onload = () => {
+        if (typeof PizZip !== 'undefined') document.getElementById('status').innerText = "מערכת מוכנה";
+    };
 
-    document.getElementById('fileInput').onchange = (e) => {
+    document.getElementById('filePicker').onchange = (e) => {
         const reader = new FileReader();
         reader.onload = (ev) => {
-            zipObj = new PizZip(ev.target.result);
-            loadContent();
+            zip = new PizZip(ev.target.result);
+            const xml = zip.file("word/document.xml").asText();
+            const doc = new DOMParser().parseFromString(xml, "application/xml");
+            const ps = Array.from(doc.getElementsByTagNameNS("*", "p"));
+
+            paragraphs = ps.map(p => {
+                const text = Array.from(p.getElementsByTagNameNS("*", "t")).map(t => t.textContent).join("").trim();
+                const isB = p.getElementsByTagNameNS("*", "b").length > 0;
+                const isC = p.getElementsByTagNameNS("*", "jc")[0]?.getAttribute("w:val") === "center";
+                return { text, isB, isC, el: p };
+            }).filter(p => p.text.length > 0);
+
+            document.getElementById('ui').style.display = 'block';
+            runLogic();
         };
         reader.readAsArrayBuffer(e.target.files[0]);
     };
 
-    function loadContent() {
-        const xml = zipObj.file("word/document.xml").asText();
-        const doc = new DOMParser().parseFromString(xml, "application/xml");
-        const ps = Array.from(doc.getElementsByTagNameNS("*", "p"));
-
-        data = ps.map(p => {
-            const text = Array.from(p.getElementsByTagNameNS("*", "t")).map(t => t.textContent).join("").trim();
-            const isBold = p.getElementsByTagNameNS("*", "b").length > 0;
-            const isCentered = p.getElementsByTagNameNS("*", "jc")[0]?.getAttribute("w:val") === "center";
-            return { text, isBold, isCentered, element: p };
-        }).filter(d => d.text.length > 0);
-
-        document.getElementById('ui-controls').style.display = 'block';
-        applyRules();
-    }
-
-    function checkSystem(p, nextP, prevP, prefix) {
-        const isB = document.getElementById(`${prefix}_bold_check`).checked && p.isBold;
-        const isC = document.getElementById(`${prefix}_center_check`).checked && p.isCentered;
-        const isW = document.getElementById(`${prefix}_words_check`).checked && p.text.split(/\s+/).length <= parseInt(document.getElementById(`${prefix}_words_val`).value);
+    function evaluate(p, next, prefix) {
+        const b = document.getElementById(`${prefix}_b`).checked && p.isB;
+        const c = document.getElementById(`${prefix}_c`).checked && p.isC;
+        const w = document.getElementById(`${prefix}_w`).checked && p.text.split(/\s+/).length <= parseInt(document.getElementById(`${prefix}_wv`).value);
         
-        const boldOnly = document.getElementById(`${prefix}_bold_only`)?.checked;
-        const centerOnly = document.getElementById(`${prefix}_center_only`)?.checked;
+        // Solo triggers
+        if (document.getElementById(`${prefix}_b_s`)?.checked && b) return true;
+        if (document.getElementById(`${prefix}_c_s`)?.checked && c) return true;
 
-        // אם מסומן "לבד", מספיק התנאי הספציפי
-        if (boldOnly && isB) return true;
-        if (centerOnly && isC) return true;
+        // Group (AND)
+        let group = [];
+        if (document.getElementById(`${prefix}_b`).checked && !document.getElementById(`${prefix}_b_s`)?.checked) group.push(b);
+        if (document.getElementById(`${prefix}_c`).checked && !document.getElementById(`${prefix}_c_s`)?.checked) group.push(c);
+        if (document.getElementById(`${prefix}_w`).checked) group.push(w);
 
-        // חוק מיוחד ל-H1: כפול
-        if (prefix === 'h1' && document.getElementById('h1_double_check').checked) {
-            const val = document.getElementById('h1_double_val').value;
-            if (p.text.startsWith(val) && nextP?.text.startsWith(val)) return true;
+        if (group.length > 0 && group.every(v => v)) return true;
+
+        // Double check (H1 specific)
+        if (prefix === 'h1' && document.getElementById('h1_double_en').checked) {
+            const key = document.getElementById('h1_double_val').value;
+            if (p.text.startsWith(key) && next?.text.startsWith(key)) return true;
         }
 
-        // שאר התנאים בקבוצה (AND)
-        let activeConds = [];
-        if (document.getElementById(`${prefix}_bold_check`).checked && !boldOnly) activeConds.push(isB);
-        if (document.getElementById(`${prefix}_center_check`).checked && !centerOnly) activeConds.push(isC);
-        if (document.getElementById(`${prefix}_words_check`).checked) activeConds.push(isW);
-
-        return activeConds.length > 0 && activeConds.every(v => v);
+        return false;
     }
 
-    function applyRules() {
-        const container = document.getElementById('previewContainer');
-        container.innerHTML = '';
-
-        data.forEach((p, i) => {
+    function runLogic() {
+        const out = document.getElementById('output');
+        out.innerHTML = '';
+        paragraphs.forEach((p, i) => {
             let role = null;
-            if (checkSystem(p, data[i+1], data[i-1], 'h1')) role = 'h1';
-            else if (checkSystem(p, data[i+1], data[i-1], 'h2')) role = 'h2';
+            if (evaluate(p, paragraphs[i+1], 'h1')) role = 'h1';
+            else if (evaluate(p, paragraphs[i+1], 'h2')) role = 'h2';
 
             p.role = role;
             const div = document.createElement('div');
-            div.className = 'p-preview';
+            div.className = 'p-view';
             div.innerText = p.text;
-            if (role === 'h1') div.classList.add('h1-style');
-            if (role === 'h2') div.classList.add('h2-style');
-            if (p.isCentered) div.classList.add('center-text');
-            container.appendChild(div);
+            if (role === 'h1') div.classList.add('h1-view');
+            if (role === 'h2') div.classList.add('h2-view');
+            if (p.isC) div.classList.add('centered');
+            out.appendChild(div);
         });
     }
 
-    function exportDoc() {
-        const xml = zipObj.file("word/document.xml").asText();
-        const doc = new DOMParser().parseFromString(xml, "application/xml");
-        const ps = Array.from(doc.getElementsByTagNameNS("*", "p"));
+    function exportFile() {
+        try {
+            const xml = zip.file("word/document.xml").asText();
+            const doc = new DOMParser().parseFromString(xml, "application/xml");
+            const ps = Array.from(doc.getElementsByTagNameNS("*", "p"));
 
-        let dIdx = 0;
-        ps.forEach(p => {
-            if (p.textContent.trim().length > 0 && data[dIdx]) {
-                const role = data[dIdx].role;
-                if (role) {
-                    let pPr = p.getElementsByTagNameNS("*", "pPr")[0] || doc.createElementNS("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "w:pPr");
-                    if (!p.contains(pPr)) p.insertBefore(pPr, p.firstChild);
-                    let style = pPr.getElementsByTagNameNS("*", "pStyle")[0] || doc.createElementNS("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "w:pStyle");
-                    if (!pPr.contains(style)) pPr.appendChild(style);
-                    style.setAttribute("w:val", role === 'h1' ? "Heading1" : "Heading2");
+            let idx = 0;
+            ps.forEach(p => {
+                if (p.textContent.trim().length > 0 && paragraphs[idx]) {
+                    const role = paragraphs[idx].role;
+                    if (role) {
+                        const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+                        let pPr = p.getElementsByTagNameNS(ns, "pPr")[0];
+                        if (!pPr) {
+                            pPr = doc.createElementNS(ns, "w:pPr");
+                            p.insertBefore(pPr, p.firstChild);
+                        }
+                        let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0];
+                        if (!style) {
+                            style = doc.createElementNS(ns, "w:pStyle");
+                            pPr.appendChild(style);
+                        }
+                        style.setAttributeNS(ns, "w:val", role === 'h1' ? "Heading1" : "Heading2");
+                    }
+                    idx++;
                 }
-                dIdx++;
-            }
-        });
+            });
 
-        zipObj.file("word/document.xml", new XMLSerializer().serializeToString(doc));
-        saveAs(zipObj.generate({type:"blob"}), "מעמד_ספר_קודש.docx");
+            zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
+            const blob = zip.generate({type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+            saveAs(blob, "ספר_מעומד.docx");
+        } catch (e) {
+            alert("שגיאה ביצירת הקובץ: " + e.message);
+        }
     }
 </script>
 </body>
