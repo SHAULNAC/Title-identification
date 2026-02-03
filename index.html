@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>PLATINUM EDITOR - Pro Export v15</title>
+    <title>PLATINUM EDITOR - Word Sync v16</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
     <style>
@@ -28,7 +28,7 @@
 <body>
 
 <div class="sidebar">
-    <h2>PLATINUM LOGIC v15</h2>
+    <h2>PLATINUM LOGIC v16</h2>
     <div id="status-bar">טוען...</div>
     <input type="file" id="fileIn" accept=".docx" style="margin-bottom:15px; width:100%;">
 
@@ -36,7 +36,7 @@
         <div class="header-section">
             <h3 style="color:var(--h1); margin:0;">כותרת 1 (H1)</h3>
             <div class="rule-group neg-group">
-                <b>שלילה:</b>
+                <b>שלילה (פסילה):</b>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notcenter"> <span>לא ממורכז</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notbold"> <span>לא מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h1_n_long_v" value="10"></div>
@@ -44,7 +44,7 @@
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי</span> <input type="number" class="live" id="h1_n_seq_n" value="1"> <span>שמתחילות ב:</span> <input type="text" class="live" id="h1_n_seq_t" value="סימן"></div>
             </div>
             <div class="rule-group pos-group">
-                <b>חיוב:</b>
+                <b>חיוב (מספיק אחד):</b>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_center" checked> <span>ממורכז</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_bold"> <span>מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h1_p_short_v" value="6"></div>
@@ -71,14 +71,14 @@
             </div>
         </div>
 
-        <button class="btn-gold" onclick="exportDoc()">הורד מסמך מעומד</button>
+        <button class="btn-gold" onclick="exportDoc()">הורד מסמך מעומד סופי</button>
     </div>
 </div>
 
 <div class="viewport"><div class="paper" id="out"></div></div>
 
 <script>
-    let zip = null, paragraphs = [], originalFileName = "document.docx";
+    let zip = null, paragraphs = [], originalFileName = "document";
     const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 
     document.addEventListener('input', (e) => { if(e.target.classList.contains('live')) updateView(); });
@@ -157,42 +157,5 @@
         let idx = 0;
 
         ps.forEach(p => {
-            const textContent = p.textContent.trim();
-            if (textContent.length > 0 && paragraphs[idx]) {
+            if (p.textContent.trim().length > 0 && paragraphs[idx]) {
                 const role = paragraphs[idx].role;
-                if (role) {
-                    let pPr = p.getElementsByTagNameNS(ns, "pPr")[0];
-                    if (!pPr) {
-                        pPr = doc.createElementNS(ns, "w:pPr");
-                        p.insertBefore(pPr, p.firstChild);
-                    }
-                    
-                    // החלת הסטייל
-                    let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0];
-                    if (!style) {
-                        style = doc.createElementNS(ns, "w:pStyle");
-                        pPr.appendChild(style);
-                    }
-                    style.setAttributeNS(ns, "w:val", role === 'h1' ? "Heading1" : "Heading2");
-
-                    // ניקוי עיצוב מקומי שעלול להפריע (מרכוז והדגשה ידנית)
-                    const jc = pPr.getElementsByTagNameNS(ns, "jc")[0];
-                    if (jc) pPr.removeChild(jc);
-                    
-                    const rPrs = Array.from(p.getElementsByTagNameNS(ns, "rPr"));
-                    rPrs.forEach(rPr => {
-                        const b = rPr.getElementsByTagNameNS(ns, "b")[0];
-                        if (b) rPr.removeChild(b);
-                    });
-                }
-                idx++;
-            }
-        });
-
-        zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
-        const out = zip.generate({type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
-        saveAs(out, originalFileName + "_מעומד.docx");
-    }
-</script>
-</body>
-</html>
