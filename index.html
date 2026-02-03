@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>PLATINUM EDITOR - Style Map v19</title>
+    <title>PLATINUM EDITOR - Web Styles v20</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
     <style>
@@ -19,7 +19,6 @@
         .paper { background: white; color: #1e293b; width: 100%; max-width: 800px; min-height: 100%; padding: 60px; box-sizing: border-box; text-align: justify; }
         .h1-style { font-size: 2rem; font-weight: 900; color: #0369a1; text-align: center !important; border-bottom: 3px double #0369a1; margin: 30px 0; }
         .h2-style { font-size: 1.5rem; font-weight: 800; color: #be185d; text-align: center !important; border-bottom: 2px dashed #be185d; margin: 20px 0; }
-        .is-bold { font-weight: bold; } .is-centered { text-align: center; }
         .btn-gold { background: linear-gradient(135deg, #fbbf24, #d97706); color: black; width: 100%; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         #status-bar { padding: 8px; border-radius: 6px; text-align: center; margin-bottom: 10px; font-weight: bold; font-size: 0.8rem; }
         .ready { background: #22c55e22; color: #4ade80; }
@@ -28,7 +27,7 @@
 <body>
 
 <div class="sidebar">
-    <h2>PLATINUM LOGIC v19</h2>
+    <h2>PLATINUM LOGIC v20</h2>
     <div id="status-bar">טוען...</div>
     <input type="file" id="fileIn" accept=".docx" style="margin-bottom:15px; width:100%;">
 
@@ -37,16 +36,16 @@
             <h3 style="color:var(--h1); margin:0;">כותרת 1 (H1)</h3>
             <div class="rule-group neg-group">
                 <b>שלילה:</b>
-                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notcenter"> <span>לא ממורכז</span></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notcenter"> <span>אי מירכוז</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notbold"> <span>לא מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h1_n_long_v" value="10"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_n_contains_v" value="."></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי</span> <input type="number" class="live" id="h1_n_seq_n" value="1"> <span>פסקאות ב:</span> <input type="text" class="live" id="h1_n_seq_t" value="סימן"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי X פסקאות שמתחילות ב-X</span> <input type="number" class="live" id="h1_n_seq_n" value="1" style="width:30px"> <input type="text" class="live" id="h1_n_seq_t" value="סימן" style="width:60px"></div>
             </div>
             <div class="rule-group pos-group">
                 <b>חיוב:</b>
-                <div class="rule-item"><input type="checkbox" class="live" id="h1_p_center" checked> <span>ממורכז</span></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h1_p_bold"> <span>מודגש</span></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h1_p_center" checked> <span>מירכוז</span></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h1_p_bold"> <span>הדגשה</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h1_p_short_v" value="6"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_p_contains_v" value="פרק"></div>
             </div>
@@ -56,18 +55,18 @@
             <h3 style="color:var(--h2); margin:0;">כותרת 2 (H2)</h3>
             <div class="rule-group neg-group">
                 <b>שלילה:</b>
-                <div class="rule-item"><input type="checkbox" class="live" id="h2_n_notcenter"> <span>לא ממורכז</span></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_n_notcenter"> <span>אי מירכוז</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_n_notbold"> <span>לא מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h2_n_long_v" value="12"></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h2_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h2_n_contains_v" value="."></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_n_contains"> <span>מכיל X:</span> <input type="text" class="live" id="h2_n_contains_v" value="."></div>
             </div>
             <div class="rule-group pos-group">
                 <b>חיוב:</b>
-                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_center" checked> <span>ממורכז</span></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_bold"> <span>מודגש</span></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_center" checked> <span>מירכוז</span></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_bold"> <span>הדגשה</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h2_p_short_v" value="8"></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h2_p_contains_v" value="סימן"></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_seq"> <span>אחרי</span> <input type="number" class="live" id="h2_p_seq_n" value="1"> <span>פסקאות ב:</span> <input type="text" class="live" id="h2_p_seq_t" value="סימן"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_contains"> <span>מכיל X:</span> <input type="text" class="live" id="h2_p_contains_v" value="סימן"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_seq"> <span>פסקה אחרי X שמתחילות ב-X</span> <input type="number" class="live" id="h2_p_seq_n" value="1" style="width:30px"> <input type="text" class="live" id="h2_p_seq_t" value="סימן" style="width:60px"></div>
             </div>
         </div>
 
@@ -151,6 +150,23 @@
 
     function exportDoc() {
         if (!zip) return;
+        
+        // יצירת קובץ Styles דמה כדי להכריח את וורד ווב להכיר את הכותרות
+        const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+            <w:style w:type="paragraph" w:styleId="Heading1">
+                <w:name w:val="heading 1"/><w:next w:val="Normal"/><w:uiPriority w:val="9"/>
+                <w:pPr><w:outlineLvl w:val="0"/></w:pPr>
+                <w:rPr><w:b/><w:sz w:val="32"/></w:rPr>
+            </w:style>
+            <w:style w:type="paragraph" w:styleId="Heading2">
+                <w:name w:val="heading 2"/><w:next w:val="Normal"/><w:uiPriority w:val="9"/>
+                <w:pPr><w:outlineLvl w:val="1"/></w:pPr>
+                <w:rPr><w:b/><w:sz w:val="26"/></w:rPr>
+            </w:style>
+        </w:styles>`;
+        zip.file("word/styles.xml", stylesXml);
+
         const xmlString = zip.file("word/document.xml").asText();
         const doc = new DOMParser().parseFromString(xmlString, "application/xml");
         const ps = Array.from(doc.getElementsByTagNameNS(ns, "p"));
@@ -162,15 +178,10 @@
                 if (role) {
                     let pPr = p.getElementsByTagNameNS(ns, "pPr")[0] || doc.createElementNS(ns, "w:pPr");
                     if (!p.contains(pPr)) p.insertBefore(pPr, p.firstChild);
-                    
-                    // הגדרת הסגנון באופן שוורד חייב לקרוא
                     let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0] || doc.createElementNS(ns, "w:pStyle");
-                    // ניסיון להגדיר את שני ה-IDs הנפוצים
-                    const styleVal = role === 'h1' ? "Heading1" : "Heading2";
-                    style.setAttributeNS(ns, "w:val", styleVal);
+                    style.setAttributeNS(ns, "w:val", role === 'h1' ? "Heading1" : "Heading2");
                     if (!pPr.contains(style)) pPr.appendChild(style);
-
-                    // ניקוי עיצוב ידני שעלול לחסום את הסגנון
+                    // ניקוי מירכוז ידני
                     const jc = pPr.getElementsByTagNameNS(ns, "jc")[0];
                     if (jc) pPr.removeChild(jc);
                 }
