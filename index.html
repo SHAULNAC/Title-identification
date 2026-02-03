@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>PLATINUM EDITOR - Word Fix v16</title>
+    <title>PLATINUM EDITOR - Outline Fix v17</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
     <style>
@@ -28,7 +28,7 @@
 <body>
 
 <div class="sidebar">
-    <h2>PLATINUM LOGIC v16</h2>
+    <h2>PLATINUM LOGIC v17</h2>
     <div id="status-bar">טוען...</div>
     <input type="file" id="fileIn" accept=".docx" style="margin-bottom:15px; width:100%;">
 
@@ -41,7 +41,6 @@
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notbold"> <span>לא מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h1_n_long_v" value="10"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_n_contains_v" value="."></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי X פסקאות שמתחילות ב-X</span></div>
             </div>
             <div class="rule-group pos-group">
                 <b>חיוב:</b>
@@ -51,6 +50,7 @@
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_p_contains_v" value="פרק"></div>
             </div>
         </div>
+
         <div class="header-section">
             <h3 style="color:var(--h2); margin:0;">כותרת 2 (H2)</h3>
             <div class="rule-group neg-group">
@@ -66,7 +66,6 @@
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_bold"> <span>מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h2_p_short_v" value="8"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h2_p_contains_v" value="סימן"></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_seq"> <span>אחרי X פסקאות שמתחילות ב-X</span></div>
             </div>
         </div>
 
@@ -88,7 +87,6 @@
         }
     }, 500);
 
-    // לוגיקה זהה לגרסה 15
     function evaluateLogic(p, i, prefix) {
         const words = p.text.split(/\s+/).length;
         if (document.getElementById(`${prefix}_n_notcenter`).checked && !p.isC) return false;
@@ -137,8 +135,7 @@
 
     function exportDoc() {
         if (!zip) return;
-        const xmlString = zip.file("word/document.xml").asText();
-        const doc = new DOMParser().parseFromString(xmlString, "application/xml");
+        const doc = new DOMParser().parseFromString(zip.file("word/document.xml").asText(), "application/xml");
         const ps = Array.from(doc.getElementsByTagNameNS(ns, "p"));
         let idx = 0;
 
@@ -149,21 +146,19 @@
                     let pPr = p.getElementsByTagNameNS(ns, "pPr")[0] || doc.createElementNS(ns, "w:pPr");
                     if (!p.contains(pPr)) p.insertBefore(pPr, p.firstChild);
                     
-                    // תיקון קריטי: הגדרת ה-ID בצורה שוורד יזהה כ-Heading
+                    // 1. הזרקת הסטייל
                     let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0] || doc.createElementNS(ns, "w:pStyle");
-                    if (!pPr.contains(style)) pPr.appendChild(style);
-                    
-                    // שימוש ב-ID האוניברסלי Heading1 / Heading2
                     style.setAttributeNS(ns, "w:val", role === 'h1' ? "Heading1" : "Heading2");
+                    if (!pPr.contains(style)) pPr.appendChild(style);
 
-                    // הסרת עיצוב ידני כדי שהסטייל יפעל
+                    // 2. הזרקת ה-Outline Level (זה מה שגורם לוורד להבין שזו כותרת!)
+                    let outline = pPr.getElementsByTagNameNS(ns, "outlineLvl")[0] || doc.createElementNS(ns, "w:outlineLvl");
+                    outline.setAttributeNS(ns, "w:val", role === 'h1' ? "0" : "1");
+                    if (!pPr.contains(outline)) pPr.appendChild(outline);
+
+                    // 3. ניקוי עיצוב דורס
                     const jc = pPr.getElementsByTagNameNS(ns, "jc")[0];
                     if (jc) pPr.removeChild(jc);
-                    const rPrs = Array.from(p.getElementsByTagNameNS(ns, "rPr"));
-                    rPrs.forEach(rPr => {
-                        const b = rPr.getElementsByTagNameNS(ns, "b")[0];
-                        if (b) rPr.removeChild(b);
-                    });
                 }
                 idx++;
             }
