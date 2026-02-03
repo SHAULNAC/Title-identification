@@ -2,25 +2,40 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>מעמד ספרים מקצועי - תיקון הורדה</title>
+    <title>מעמד ספרים מקצועי - גרסה משודרגת</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
     <style>
-        :root { --sidebar: #2c3e50; --bg: #f5f6fa; --primary: #27ae60; --h1: #2980b9; --h2: #e67e22; }
+        :root { --sidebar: #2c3e50; --bg: #f5f6fa; --primary: #27ae60; --h1: #2980b9; --h2: #e67e22; --donate: #ff5e5b; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
+        
         .sidebar { width: 420px; background: var(--sidebar); color: white; padding: 20px; overflow-y: auto; box-shadow: 4px 0 10px rgba(0,0,0,0.3); z-index: 10; }
-        .rule-card { background: #34495e; border-radius: 12px; padding: 15px; margin-bottom: 20px; border-right: 6px solid var(--primary); }
+        .rule-card { background: #34495e; border-radius: 12px; padding: 15px; margin-bottom: 20px; border-right: 6px solid var(--primary); position: relative; }
         .rule-card.h2-card { border-right-color: var(--h2); }
+        
         .group-box { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-top: 10px; }
         .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.9rem; }
-        input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; }
-        input[type="text"], input[type="number"] { flex: 1; padding: 5px; border-radius: 4px; border: none; }
+        
+        /* Tooltip Style */
+        .has-tip { position: relative; cursor: help; }
+        .has-tip:hover::after {
+            content: attr(data-tip);
+            position: absolute; bottom: 125%; right: 0; background: #000; color: #fff;
+            padding: 8px; border-radius: 4px; font-size: 0.8rem; width: 200px; z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); line-height: 1.4;
+        }
+
+        /* Viewport & Paper */
         .viewport { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
         .paper { background: white; width: 100%; max-width: 800px; min-height: 100%; padding: 60px; box-shadow: 0 0 20px rgba(0,0,0,0.1); box-sizing: border-box; word-wrap: break-word; }
+        
         .h1-style { font-size: 2em; font-weight: bold; color: var(--h1); text-align: center; background: #e3f2fd; border: 2px solid var(--h1); margin: 25px 0; padding: 10px; }
         .h2-style { font-size: 1.5em; font-weight: bold; color: var(--h2); text-align: center; background: #fff3e0; border: 2px dashed var(--h2); margin: 15px 0; padding: 8px; }
-        .center-text { text-align: center; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; margin-top: 10px; }
+        
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; margin-top: 10px; position: relative; }
+        .btn-donate { background: var(--donate); text-decoration: none; display: flex; justify-content: center; align-items: center; margin-top: 30px; }
+        .btn-donate:hover { filter: brightness(1.1); }
+        
         #status-bar { text-align: center; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-weight: bold; }
         .ready { background: #27ae60; color: white; }
     </style>
@@ -34,24 +49,40 @@
 
     <div id="ui" style="display:none;">
         <div class="rule-card">
-            <h3>כותרת 1 (H1)</h3>
-            <div class="row"><input type="checkbox" id="h1_double"> <span>רצף מילים:</span> <input type="text" id="h1_double_val" value="סימן" style="width:60px;"></div>
+            <h3>כותרת 1 (רמה א')</h3>
+            <div class="row has-tip" data-tip="הפסקה תהפוך לכותרת 1 רק אם היא הראשונה ברצף שמתחילה במילה זו.">
+                <input type="checkbox" id="h1_seq"> <span>ראשונה ברצף של:</span>
+                <input type="text" id="h1_seq_val" value="סימן" style="width:60px;">
+            </div>
             <div class="group-box">
                 <div class="row"><input type="checkbox" id="h1_b"> <span>מודגש</span> <input type="checkbox" id="h1_b_s"> <small>סולו</small></div>
                 <div class="row"><input type="checkbox" id="h1_c"> <span>ממורכז</span> <input type="checkbox" id="h1_c_s"> <small>סולו</small></div>
-                <div class="row"><input type="checkbox" id="h1_w"> <span>קצר מ-</span> <input type="number" id="h1_wv" value="5" style="width:40px;"></div>
             </div>
         </div>
+
         <div class="rule-card h2-card">
-            <h3>כותרת 2 (H2)</h3>
+            <h3>כותרת 2 (רמה ב')</h3>
+            <div class="row has-tip" data-tip="הפסקה תהפוך לכותרת 2 אם היא השנייה ברצף שמתחילה במילה הזו.">
+                <input type="checkbox" id="h2_seq"> <span>שנייה ברצף של:</span>
+                <input type="text" id="h2_seq_val" value="סימן" style="width:60px;">
+            </div>
             <div class="group-box">
                 <div class="row"><input type="checkbox" id="h2_b"> <span>מודגש</span> <input type="checkbox" id="h2_b_s"> <small>סולו</small></div>
-                <div class="row"><input type="checkbox" id="h2_c"> <span>ממורכז</span> <input type="checkbox" id="h2_c_s"> <small>סולו</small></div>
                 <div class="row"><input type="checkbox" id="h2_w" checked> <span>קצר מ-</span> <input type="number" id="h2_wv" value="6" style="width:40px;"></div>
             </div>
         </div>
-        <button class="btn" style="background:#27ae60" onclick="updateView()">עדכן תצוגה</button>
-        <button class="btn" style="background:#e67e22" onclick="downloadDoc()">הורד קובץ מתוקן</button>
+
+        <div class="has-tip" data-tip="עדכן את התצוגה המקדימה בדף הלבן לפי החוקים החדשים">
+            <button class="btn" style="background:#27ae60" onclick="updateView()">עדכן תצוגה</button>
+        </div>
+        
+        <div class="has-tip" data-tip="שמור את השינויים והורד קובץ וורד חדש עם סגנונות מובנים">
+            <button class="btn" style="background:#e67e22" onclick="downloadDoc()">הורד קובץ מתוקן</button>
+        </div>
+
+        <a href="https://ko-fi.com/shaulnac" target="_blank" class="btn btn-donate">
+            ❤️ תרומה לפיתוח הפרויקט
+        </a>
     </div>
 </div>
 
@@ -63,13 +94,10 @@
     let zip = null;
     let paragraphs = [];
 
-    // וידוא טעינה
     setInterval(() => {
         const bar = document.getElementById('status-bar');
         if (typeof PizZip !== 'undefined' && (typeof saveAs !== 'undefined' || typeof window.saveAs !== 'undefined')) {
             bar.innerText = "המערכת מוכנה!"; bar.className = "ready";
-        } else {
-            bar.innerText = "טוען ספריות..."; bar.style.background = "#f1c40f";
         }
     }, 500);
 
@@ -78,42 +106,59 @@
         reader.onload = (ev) => {
             zip = new PizZip(ev.target.result);
             const doc = new DOMParser().parseFromString(zip.file("word/document.xml").asText(), "application/xml");
-            paragraphs = Array.from(doc.getElementsByTagNameNS("*", "p")).map(p => {
-                return {
-                    text: Array.from(p.getElementsByTagNameNS("*", "t")).map(t => t.textContent).join("").trim(),
-                    isB: p.getElementsByTagNameNS("*", "b").length > 0,
-                    isC: p.getElementsByTagNameNS("*", "jc")[0]?.getAttribute("w:val") === "center"
-                };
-            }).filter(p => p.text.length > 0);
+            paragraphs = Array.from(doc.getElementsByTagNameNS("*", "p")).map(p => ({
+                text: Array.from(p.getElementsByTagNameNS("*", "t")).map(t => t.textContent).join("").trim(),
+                isB: p.getElementsByTagNameNS("*", "b").length > 0,
+                isC: p.getElementsByTagNameNS("*", "jc")[0]?.getAttribute("w:val") === "center"
+            })).filter(p => p.text.length > 0);
             document.getElementById('ui').style.display = 'block';
             updateView();
         };
         reader.readAsArrayBuffer(e.target.files[0]);
     };
 
-    function evaluate(p, next, prefix) {
+    function evaluate(p, prev, next, prefix) {
         const b = document.getElementById(`${prefix}_b`).checked && p.isB;
-        const c = document.getElementById(`${prefix}_c`).checked && p.isC;
-        const w = document.getElementById(`${prefix}_w`).checked && p.text.split(/\s+/).length <= parseInt(document.getElementById(`${prefix}_wv`).value);
+        const c = (document.getElementById(`${prefix}_c`)?.checked && p.isC) || false;
+        const w = document.getElementById(`${prefix}_w`)?.checked ? (p.text.split(/\s+/).length <= parseInt(document.getElementById(`${prefix}_wv`).value)) : false;
+
+        // Solo Triggers
         if (document.getElementById(`${prefix}_b_s`)?.checked && b) return true;
         if (document.getElementById(`${prefix}_c_s`)?.checked && c) return true;
+
+        // Sequence Logic
+        const seqVal = document.getElementById(`${prefix}_seq_val`)?.value;
+        if (document.getElementById(`${prefix}_seq`)?.checked) {
+            const currentStarts = p.text.startsWith(seqVal);
+            const prevStarts = prev ? prev.text.startsWith(seqVal) : false;
+            const nextStarts = next ? next.text.startsWith(seqVal) : false;
+
+            if (prefix === 'h1') {
+                // H1: מתחיל במילה, הבא אחריו גם, אבל הקודם לו לא.
+                if (currentStarts && nextStarts && !prevStarts) return true;
+            }
+            if (prefix === 'h2') {
+                // H2: מתחיל במילה, וגם הקודם לו התחיל במילה.
+                if (currentStarts && prevStarts) return true;
+            }
+        }
+
+        // Group Logic
         let g = [];
         if (document.getElementById(`${prefix}_b`).checked && !document.getElementById(`${prefix}_b_s`)?.checked) g.push(b);
-        if (document.getElementById(`${prefix}_c`).checked && !document.getElementById(`${prefix}_c_s`)?.checked) g.push(c);
-        if (document.getElementById(`${prefix}_w`).checked) g.push(w);
-        if (g.length > 0 && g.every(v => v)) return true;
-        if (prefix === 'h1' && document.getElementById('h1_double').checked) {
-            const val = document.getElementById('h1_double_val').value;
-            if (p.text.startsWith(val) && next?.text.startsWith(val)) return true;
-        }
-        return false;
+        if (document.getElementById(`${prefix}_c`)?.checked && !document.getElementById(`${prefix}_c_s`)?.checked) g.push(c);
+        if (document.getElementById(`${prefix}_w`)?.checked) g.push(w);
+        
+        return g.length > 0 && g.every(v => v);
     }
 
     function updateView() {
         const area = document.getElementById('contentArea');
         area.innerHTML = '';
         paragraphs.forEach((p, i) => {
-            p.role = evaluate(p, paragraphs[i+1], 'h1') ? 'h1' : (evaluate(p, paragraphs[i+1], 'h2') ? 'h2' : null);
+            p.role = evaluate(p, paragraphs[i-1], paragraphs[i+1], 'h1') ? 'h1' : 
+                    (evaluate(p, paragraphs[i-1], paragraphs[i+1], 'h2') ? 'h2' : null);
+            
             const div = document.createElement('div');
             div.className = 'p-preview' + (p.role ? ' ' + p.role + '-style' : '') + (p.isC ? ' center-text' : '');
             div.innerText = p.text;
@@ -124,8 +169,7 @@
     function downloadDoc() {
         try {
             const xml = zip.file("word/document.xml").asText();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(xml, "application/xml");
+            const doc = new DOMParser().parseFromString(xml, "application/xml");
             const ps = Array.from(doc.getElementsByTagNameNS("*", "p"));
             const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 
@@ -145,17 +189,9 @@
             });
 
             zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
-            const out = zip.generate({type:"blob", mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
-            
-            // שימוש בשיטה הבטוחה ביותר להורדה
-            if (window.saveAs) window.saveAs(out, "מעמד_ספר.docx");
-            else if (typeof saveAs !== 'undefined') saveAs(out, "מעמד_ספר.docx");
-            else {
-                const url = window.URL.createObjectURL(out);
-                const a = document.createElement('a');
-                a.href = url; a.download = "מעמד_ספר.docx"; a.click();
-            }
-        } catch(e) { alert("שגיאה סופית: " + e.message); }
+            const out = zip.generate({type:"blob"});
+            if (window.saveAs) window.saveAs(out, "מעמד_ספר_מעודכן.docx");
+        } catch(e) { alert("שגיאה: " + e.message); }
     }
 </script>
 </body>
