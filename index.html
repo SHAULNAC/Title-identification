@@ -2,90 +2,87 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>PLATINUM EDITOR - Professional v21</title>
+    <title>PLATINUM EDITOR - Full Preview v22</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
     <style>
         :root { --bg: #0f172a; --panel: #1e293b; --accent: #fbbf24; --text: #f8fafc; --h1: #38bdf8; --h2: #f472b6; --red: #ef4444; --green: #22c55e; }
         body { font-family: 'Segoe UI', system-ui; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--text); overflow: hidden; }
         
-        /* Sidebar & UI */
-        .sidebar { width: 480px; background: var(--panel); padding: 20px; overflow-y: auto; border-left: 1px solid #334155; }
-        .header-section { background: rgba(255,255,255,0.02); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid #475569; }
-        .rule-group { margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 0.85rem; }
-        .neg-group { background: rgba(239, 68, 68, 0.08); border: 1px solid var(--red); margin-bottom: 10px; }
-        .pos-group { background: rgba(34, 197, 94, 0.08); border: 1px solid var(--green); }
-        .rule-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: help; }
-        .rule-item input[type="text"], .rule-item input[type="number"] { background: #0f172a; border: 1px solid #475569; color: white; border-radius: 4px; padding: 2px 5px; width: 45px; }
+        /* Sidebar - Compact Mode */
+        .sidebar { width: 380px; background: var(--panel); padding: 15px; overflow-y: auto; border-left: 1px solid #334155; }
+        .sidebar h2 { font-size: 1.2rem; margin-bottom: 10px; }
+        .header-section { background: rgba(255,255,255,0.02); border-radius: 8px; padding: 10px; margin-bottom: 12px; border: 1px solid #475569; }
+        .rule-group { margin-top: 5px; padding: 8px; border-radius: 6px; font-size: 0.75rem; }
+        .rule-item { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; cursor: help; }
+        .rule-item input[type="text"], .rule-item input[type="number"] { background: #0f172a; border: 1px solid #475569; color: white; border-radius: 3px; padding: 1px 4px; width: 35px; font-size: 0.75rem; }
         
-        /* Viewport & Paper - Fixed Scrolling */
-        .viewport { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; background: #020617; height: 100vh; }
-        .paper { background: white; color: #1e293b; width: 100%; max-width: 800px; min-height: 297mm; padding: 60px; box-sizing: border-box; text-align: justify; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* Viewport & Paper */
+        .viewport { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; background: #020617; }
+        .paper { background: white; color: #1e293b; width: 100%; max-width: 800px; min-height: 297mm; padding: 50px; box-sizing: border-box; text-align: justify; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 14px; line-height: 1.6; }
         
-        /* Styles in Preview */
-        .h1-style { font-size: 2rem; font-weight: 900; color: #0369a1; text-align: center !important; border-bottom: 3px double #0369a1; margin: 30px 0; }
-        .h2-style { font-size: 1.5rem; font-weight: 800; color: #be185d; text-align: center !important; border-bottom: 2px dashed #be185d; margin: 20px 0; }
+        /* Preview Styles */
+        .p-view { margin-bottom: 10px; white-space: pre-wrap; }
+        .h1-style { font-size: 1.8rem !important; font-weight: 900 !important; color: #0369a1 !important; text-align: center !important; border-bottom: 3px double #0369a1; margin: 25px 0 !important; }
+        .h2-style { font-size: 1.4rem !important; font-weight: 800 !important; color: #be185d !important; text-align: center !important; border-bottom: 2px dashed #be185d; margin: 18px 0 !important; }
         .is-bold { font-weight: bold; }
         .is-centered { text-align: center; }
         
-        /* Buttons */
-        .btn-gold { background: linear-gradient(135deg, #fbbf24, #d97706); color: black; width: 100%; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
-        .btn-gold:hover { filter: brightness(1.1); }
-        .donate-btn { background: #22c55e; color: white; text-decoration: none; display: block; text-align: center; padding: 10px; border-radius: 8px; margin-top: 20px; font-weight: bold; font-size: 0.9rem; border: 1px solid #16a34a; }
+        /* Interactive Elements */
+        .btn-gold { background: linear-gradient(135deg, #fbbf24, #d97706); color: black; width: 100%; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 0.9rem; }
+        .donate-btn { background: #10b981; color: white; text-decoration: none; display: block; text-align: center; padding: 8px; border-radius: 6px; margin-top: 15px; font-weight: bold; font-size: 0.8rem; }
         
-        #status-bar { padding: 8px; border-radius: 6px; text-align: center; margin-bottom: 10px; font-weight: bold; font-size: 0.8rem; }
+        #status-bar { padding: 5px; border-radius: 4px; text-align: center; margin-bottom: 8px; font-weight: bold; font-size: 0.7rem; }
         .ready { background: #22c55e22; color: #4ade80; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2 style="margin-top:0; color:var(--accent);">PLATINUM LOGIC v21</h2>
-    <div id="status-bar">טוען ספריות...</div>
-    <input type="file" id="fileIn" accept=".docx" style="margin-bottom:15px; width:100%; color: white;">
+    <h2 style="color:var(--accent);">PLATINUM LOGIC v22</h2>
+    <div id="status-bar">טוען...</div>
+    <input type="file" id="fileIn" accept=".docx" style="margin-bottom:10px; width:100%; font-size: 0.8rem;">
 
     <div id="ui" style="display:none;">
         <div class="header-section">
-            <h3 style="color:var(--h1); margin:0;">כותרת 1 (H1)</h3>
-            <div class="rule-group neg-group">
-                <div class="rule-item" title="הפסקה תיפסל אם היא לא במרכז"><input type="checkbox" class="live" id="h1_n_notcenter"> <span>אי מירכוז</span></div>
-                <div class="rule-item" title="הפסקה תיפסל אם הטקסט לא מודגש במקור"><input type="checkbox" class="live" id="h1_n_notbold"> <span>לא מודגש</span></div>
-                <div class="rule-item" title="הפסקה תיפסל אם יש בה יותר מדי מילים"><input type="checkbox" class="live" id="h1_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h1_n_long_v" value="10"></div>
-                <div class="rule-item" title="הפסקה תיפסל אם היא מכילה תו ספציפי (למשל נקודה בסוף)"><input type="checkbox" class="live" id="h1_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_n_contains_v" value="."></div>
-                <div class="rule-item" title="הפסקה תיפסל אם היא מופיעה אחרי רצף של פסקאות שמתחילות בטקסט מסוים"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי</span> <input type="number" class="live" id="h1_n_seq_n" value="1"> <span>פסקאות ב:</span> <input type="text" class="live" id="h1_n_seq_t" value="סימן"></div>
+            <h4 style="color:var(--h1); margin:0 0 5px 0;">כותרת 1 (H1)</h4>
+            <div class="rule-group neg-group" style="background:rgba(239,68,68,0.1); border:1px solid var(--red);">
+                <div class="rule-item" title="פסילה אם לא במרכז"><input type="checkbox" class="live" id="h1_n_notcenter"> <span>אי מירכוז</span></div>
+                <div class="rule-item" title="פסילה אם לא מודגש"><input type="checkbox" class="live" id="h1_n_notbold"> <span>לא מודגש</span></div>
+                <div class="rule-item" title="פסילה אם ארוך מ-X מילים"><input type="checkbox" class="live" id="h1_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h1_n_long_v" value="10"></div>
+                <div class="rule-item" title="פסילה אם מכיל תו מסוים"><input type="checkbox" class="live" id="h1_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_n_contains_v" value="."></div>
+                <div class="rule-item" title="שלילה אם מגיע אחרי רצף פסקאות"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי</span> <input type="number" class="live" id="h1_n_seq_n" value="1"> <span>פסקאות ב:</span> <input type="text" class="live" id="h1_n_seq_t" value="סימן"></div>
             </div>
-            <div class="rule-group pos-group">
-                <div class="rule-item" title="יזוהה ככותרת אם הפסקה ממורכזת"><input type="checkbox" class="live" id="h1_p_center" checked> <span>מירכוז</span></div>
-                <div class="rule-item" title="יזוהה ככותרת אם הפסקה מודגשת"><input type="checkbox" class="live" id="h1_p_bold"> <span>הדגשה</span></div>
-                <div class="rule-item" title="יזוהה ככותרת אם הפסקה קצרה במיוחד"><input type="checkbox" class="live" id="h1_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h1_p_short_v" value="6"></div>
-                <div class="rule-item" title="יזוהה ככותרת אם המילה מופיעה בטקסט"><input type="checkbox" class="live" id="h1_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_p_contains_v" value="פרק"></div>
+            <div class="rule-group pos-group" style="background:rgba(34,197,94,0.1); border:1px solid var(--green);">
+                <div class="rule-item" title="זיהוי אם ממורכז"><input type="checkbox" class="live" id="h1_p_center" checked> <span>מירכוז</span></div>
+                <div class="rule-item" title="זיהוי אם מודגש"><input type="checkbox" class="live" id="h1_p_bold"> <span>הדגשה</span></div>
+                <div class="rule-item" title="זיהוי אם קצר מ-X מילים"><input type="checkbox" class="live" id="h1_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h1_p_short_v" value="6"></div>
+                <div class="rule-item" title="זיהוי אם מכיל מילה"><input type="checkbox" class="live" id="h1_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_p_contains_v" value="פרק"></div>
             </div>
         </div>
 
         <div class="header-section">
-            <h3 style="color:var(--h2); margin:0;">כותרת 2 (H2)</h3>
-            <div class="rule-group neg-group">
-                <div class="rule-item" title="פסילה אם לא ממורכז"><input type="checkbox" class="live" id="h2_n_notcenter"> <span>אי מירכוז</span></div>
-                <div class="rule-item" title="פסילה אם ארוך מדי"><input type="checkbox" class="live" id="h2_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h2_n_long_v" value="12"></div>
-                <div class="rule-item" title="פסילה אם מכיל תו מסוים"><input type="checkbox" class="live" id="h2_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h2_n_contains_v" value="."></div>
+            <h4 style="color:var(--h2); margin:0 0 5px 0;">כותרת 2 (H2)</h4>
+            <div class="rule-group neg-group" style="background:rgba(239,68,68,0.1); border:1px solid var(--red);">
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_n_notcenter"> <span>אי מירכוז</span></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h2_n_long_v" value="12"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h2_n_contains_v" value="."></div>
             </div>
-            <div class="rule-group pos-group">
-                <div class="rule-item" title="חיוב אם ממורכז"><input type="checkbox" class="live" id="h2_p_center" checked> <span>מירכוז</span></div>
-                <div class="rule-item" title="חיוב אם קצר"><input type="checkbox" class="live" id="h2_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h2_p_short_v" value="8"></div>
-                <div class="rule-item" title="חיוב אם מכיל מילה"><input type="checkbox" class="live" id="h2_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h2_p_contains_v" value="סימן"></div>
-                <div class="rule-item" title="חיוב אם מופיע אחרי רצף פסקאות (למשל אחרי 'סימן')"><input type="checkbox" class="live" id="h2_p_seq"> <span>אחרי</span> <input type="number" class="live" id="h2_p_seq_n" value="1"> <span>פסקאות ב:</span> <input type="text" class="live" id="h2_p_seq_t" value="סימן"></div>
+            <div class="rule-group pos-group" style="background:rgba(34,197,94,0.1); border:1px solid var(--green);">
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_center" checked> <span>מירכוז</span></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h2_p_short_v" value="8"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h2_p_contains_v" value="סימן"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_seq"> <span>אחרי</span> <input type="number" class="live" id="h2_p_seq_n" value="1"> <span>פסקאות ב:</span> <input type="text" class="live" id="h2_p_seq_t" value="סימן"></div>
             </div>
         </div>
 
-        <button class="btn-gold" onclick="exportDoc()">הורד מסמך מעומד סופי</button>
-        <a href="https://www.paypal.com" target="_blank" class="donate-btn">תמיכה בפיתוח הפרויקט ❤️</a>
+        <button class="btn-gold" onclick="exportDoc()">הורד מסמך DOCX</button>
+        <a href="https://www.paypal.com/donate" target="_blank" class="donate-btn">תרומה לפיתוח הפרויקט ❤️</a>
     </div>
 </div>
 
 <div class="viewport">
-    <div class="paper" id="out">
-        <div style="text-align:center; color:#94a3b8; margin-top:200px;">העלה קובץ DOCX כדי להתחיל בעימוד...</div>
-    </div>
+    <div class="paper" id="out"></div>
 </div>
 
 <script>
@@ -95,8 +92,8 @@
     document.addEventListener('input', (e) => { if(e.target.classList.contains('live')) updateView(); });
 
     setInterval(() => {
-        if (typeof PizZip !== 'undefined' && typeof saveAs !== 'undefined') {
-            const b = document.getElementById('status-bar'); b.innerText = "המערכת מוכנה לעבודה"; b.className = "ready";
+        if (typeof PizZip !== 'undefined') {
+            const b = document.getElementById('status-bar'); b.innerText = "מערכת מוכנה"; b.className = "ready";
         }
     }, 500);
 
@@ -151,7 +148,7 @@
             const doc = new DOMParser().parseFromString(zip.file("word/document.xml").asText(), "application/xml");
             paragraphs = Array.from(doc.getElementsByTagNameNS("*", "p")).map(p => ({
                 text: Array.from(p.getElementsByTagNameNS("*", "t")).map(t => t.textContent).join("").trim(),
-                isB: p.getElementsByTagNameNS("*", "b").length > 0,
+                isB: p.getElementsByTagNameNS("*", "b").length > 0 || p.getElementsByTagNameNS("*", "bCs").length > 0,
                 isC: p.getElementsByTagNameNS("*", "jc")[0]?.getAttribute("w:val") === "center"
             })).filter(p => p.text.length > 0);
             document.getElementById('ui').style.display = 'block';
@@ -162,28 +159,15 @@
 
     function exportDoc() {
         if (!zip) return;
-        
-        // יצירת/עדכון קובץ הסטיילס
         const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-            <w:style w:type="paragraph" w:styleId="Heading1">
-                <w:name w:val="heading 1"/><w:next w:val="Normal"/><w:qFormat/>
-                <w:pPr><w:outlineLvl w:val="0"/></w:pPr>
-                <w:rPr><w:b/><w:sz w:val="36"/></w:rPr>
-            </w:style>
-            <w:style w:type="paragraph" w:styleId="Heading2">
-                <w:name w:val="heading 2"/><w:next w:val="Normal"/><w:qFormat/>
-                <w:pPr><w:outlineLvl w:val="1"/></w:pPr>
-                <w:rPr><w:b/><w:sz w:val="28"/></w:rPr>
-            </w:style>
+            <w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:pPr><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="36"/></w:rPr></w:style>
+            <w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:pPr><w:outlineLvl w:val="1"/></w:pPr><w:rPr><w:b/><w:sz w:val="28"/></w:rPr></w:style>
         </w:styles>`;
         zip.file("word/styles.xml", stylesXml);
-
-        const xmlString = zip.file("word/document.xml").asText();
-        const doc = new DOMParser().parseFromString(xmlString, "application/xml");
+        const doc = new DOMParser().parseFromString(zip.file("word/document.xml").asText(), "application/xml");
         const ps = Array.from(doc.getElementsByTagNameNS(ns, "p"));
         let idx = 0;
-
         ps.forEach(p => {
             if (p.textContent.trim().length > 0 && paragraphs[idx]) {
                 const role = paragraphs[idx].role;
@@ -199,10 +183,8 @@
                 idx++;
             }
         });
-
         zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
-        const out = zip.generate({type: "blob"});
-        saveAs(out, originalFileName + "_מעומד.docx");
+        saveAs(zip.generate({type:"blob"}), originalFileName + "_מעומד.docx");
     }
 </script>
 </body>
