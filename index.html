@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>PLATINUM EDITOR - Full Logic v14</title>
+    <title>PLATINUM EDITOR - Pro Export v15</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
     <style>
@@ -20,7 +20,7 @@
         .h1-style { font-size: 2rem; font-weight: 900; color: #0369a1; text-align: center !important; border-bottom: 3px double #0369a1; margin: 30px 0; }
         .h2-style { font-size: 1.5rem; font-weight: 800; color: #be185d; text-align: center !important; border-bottom: 2px dashed #be185d; margin: 20px 0; }
         .is-bold { font-weight: bold; } .is-centered { text-align: center; }
-        .btn-gold { background: linear-gradient(135deg, #fbbf24, #d97706); color: black; width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-gold { background: linear-gradient(135deg, #fbbf24, #d97706); color: black; width: 100%; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         #status-bar { padding: 8px; border-radius: 6px; text-align: center; margin-bottom: 10px; font-weight: bold; font-size: 0.8rem; }
         .ready { background: #22c55e22; color: #4ade80; }
     </style>
@@ -28,7 +28,7 @@
 <body>
 
 <div class="sidebar">
-    <h2>PLATINUM LOGIC v14</h2>
+    <h2>PLATINUM LOGIC v15</h2>
     <div id="status-bar">טוען...</div>
     <input type="file" id="fileIn" accept=".docx" style="margin-bottom:15px; width:100%;">
 
@@ -36,7 +36,7 @@
         <div class="header-section">
             <h3 style="color:var(--h1); margin:0;">כותרת 1 (H1)</h3>
             <div class="rule-group neg-group">
-                <b>שלילה (פסילה):</b>
+                <b>שלילה:</b>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notcenter"> <span>לא ממורכז</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notbold"> <span>לא מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h1_n_long_v" value="10"></div>
@@ -44,7 +44,7 @@
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי</span> <input type="number" class="live" id="h1_n_seq_n" value="1"> <span>שמתחילות ב:</span> <input type="text" class="live" id="h1_n_seq_t" value="סימן"></div>
             </div>
             <div class="rule-group pos-group">
-                <b>חיוב (מספיק אחד):</b>
+                <b>חיוב:</b>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_center" checked> <span>ממורכז</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_bold"> <span>מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h1_p_short_v" value="6"></div>
@@ -72,14 +72,15 @@
         </div>
 
         <button class="btn-gold" onclick="exportDoc()">הורד מסמך מעומד</button>
-        <a href="https://ko-fi.com/shaulnac" target="_blank" style="display:block; text-align:center; color:var(--accent); margin-top:10px; text-decoration:none; font-size:0.8rem;">❤️ תמיכה ביוצר</a>
     </div>
 </div>
 
 <div class="viewport"><div class="paper" id="out"></div></div>
 
 <script>
-    let zip = null, paragraphs = [];
+    let zip = null, paragraphs = [], originalFileName = "document.docx";
+    const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+
     document.addEventListener('input', (e) => { if(e.target.classList.contains('live')) updateView(); });
 
     setInterval(() => {
@@ -98,27 +99,21 @@
 
     function evaluateLogic(p, i, prefix) {
         const words = p.text.split(/\s+/).length;
-        
-        // --- שלילה ---
         if (document.getElementById(`${prefix}_n_notcenter`).checked && !p.isC) return false;
         if (document.getElementById(`${prefix}_n_notbold`)?.checked && !p.isB) return false;
         if (document.getElementById(`${prefix}_n_long`).checked && words > parseInt(document.getElementById(`${prefix}_n_long_v`).value)) return false;
         if (document.getElementById(`${prefix}_n_contains`).checked && p.text.includes(document.getElementById(`${prefix}_n_contains_v`).value)) return false;
-        
         if (prefix === 'h1' && document.getElementById(`h1_n_seq`).checked) {
             if (checkSeq(i, parseInt(document.getElementById('h1_n_seq_n').value), document.getElementById('h1_n_seq_t').value)) return false;
         }
 
-        // --- חיוב ---
         if (document.getElementById(`${prefix}_p_center`).checked && p.isC) return true;
         if (document.getElementById(`${prefix}_p_bold`).checked && p.isB) return true;
         if (document.getElementById(`${prefix}_p_short`).checked && words < parseInt(document.getElementById(`${prefix}_p_short_v`).value)) return true;
         if (document.getElementById(`${prefix}_p_contains`).checked && p.text.includes(document.getElementById(`${prefix}_p_contains_v`).value)) return true;
-        
         if (prefix === 'h2' && document.getElementById(`h2_p_seq`).checked) {
             if (checkSeq(i, parseInt(document.getElementById('h2_p_seq_n').value), document.getElementById('h2_p_seq_t').value)) return true;
         }
-
         return false;
     }
 
@@ -136,6 +131,9 @@
     }
 
     document.getElementById('fileIn').onchange = (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        originalFileName = file.name.replace(/\.[^/.]+$/, "");
         const r = new FileReader();
         r.onload = (ev) => {
             zip = new PizZip(ev.target.result);
@@ -148,28 +146,52 @@
             document.getElementById('ui').style.display = 'block';
             updateView();
         };
-        r.readAsArrayBuffer(e.target.files[0]);
+        r.readAsArrayBuffer(file);
     };
 
     function exportDoc() {
-        const xml = zip.file("word/document.xml").asText();
-        const doc = new DOMParser().parseFromString(xml, "application/xml");
-        const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+        if (!zip) return;
+        const xmlString = zip.file("word/document.xml").asText();
+        const doc = new DOMParser().parseFromString(xmlString, "application/xml");
+        const ps = Array.from(doc.getElementsByTagNameNS(ns, "p"));
         let idx = 0;
-        Array.from(doc.getElementsByTagNameNS("*", "p")).forEach(p => {
-            if (p.textContent.trim().length > 0 && paragraphs[idx]) {
+
+        ps.forEach(p => {
+            const textContent = p.textContent.trim();
+            if (textContent.length > 0 && paragraphs[idx]) {
                 const role = paragraphs[idx].role;
                 if (role) {
-                    let pPr = p.getElementsByTagNameNS(ns, "pPr")[0] || doc.createElementNS(ns, "w:pPr");
-                    if (!p.contains(pPr)) p.insertBefore(pPr, p.firstChild);
-                    let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0] || doc.createElementNS(ns, "w:pStyle");
+                    let pPr = p.getElementsByTagNameNS(ns, "pPr")[0];
+                    if (!pPr) {
+                        pPr = doc.createElementNS(ns, "w:pPr");
+                        p.insertBefore(pPr, p.firstChild);
+                    }
+                    
+                    // החלת הסטייל
+                    let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0];
+                    if (!style) {
+                        style = doc.createElementNS(ns, "w:pStyle");
+                        pPr.appendChild(style);
+                    }
                     style.setAttributeNS(ns, "w:val", role === 'h1' ? "Heading1" : "Heading2");
+
+                    // ניקוי עיצוב מקומי שעלול להפריע (מרכוז והדגשה ידנית)
+                    const jc = pPr.getElementsByTagNameNS(ns, "jc")[0];
+                    if (jc) pPr.removeChild(jc);
+                    
+                    const rPrs = Array.from(p.getElementsByTagNameNS(ns, "rPr"));
+                    rPrs.forEach(rPr => {
+                        const b = rPr.getElementsByTagNameNS(ns, "b")[0];
+                        if (b) rPr.removeChild(b);
+                    });
                 }
                 idx++;
             }
         });
+
         zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
-        saveAs(zip.generate({type:"blob"}), "מעמד_ספר_v14.docx");
+        const out = zip.generate({type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+        saveAs(out, originalFileName + "_מעומד.docx");
     }
 </script>
 </body>
