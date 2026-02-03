@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>PLATINUM EDITOR - Outline Fix v17</title>
+    <title>PLATINUM EDITOR - Style Map v19</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
     <style>
@@ -28,7 +28,7 @@
 <body>
 
 <div class="sidebar">
-    <h2>PLATINUM LOGIC v17</h2>
+    <h2>PLATINUM LOGIC v19</h2>
     <div id="status-bar">טוען...</div>
     <input type="file" id="fileIn" accept=".docx" style="margin-bottom:15px; width:100%;">
 
@@ -41,6 +41,7 @@
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notbold"> <span>לא מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h1_n_long_v" value="10"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_n_contains_v" value="."></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי</span> <input type="number" class="live" id="h1_n_seq_n" value="1"> <span>פסקאות ב:</span> <input type="text" class="live" id="h1_n_seq_t" value="סימן"></div>
             </div>
             <div class="rule-group pos-group">
                 <b>חיוב:</b>
@@ -66,6 +67,7 @@
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_bold"> <span>מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h2_p_short_v" value="8"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h2_p_contains_v" value="סימן"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_seq"> <span>אחרי</span> <input type="number" class="live" id="h2_p_seq_n" value="1"> <span>פסקאות ב:</span> <input type="text" class="live" id="h2_p_seq_t" value="סימן"></div>
             </div>
         </div>
 
@@ -87,17 +89,31 @@
         }
     }, 500);
 
+    function checkSeq(idx, count, text) {
+        if (idx < count) return false;
+        for (let i = 1; i <= count; i++) {
+            if (!paragraphs[idx - i].text.startsWith(text)) return false;
+        }
+        return true;
+    }
+
     function evaluateLogic(p, i, prefix) {
         const words = p.text.split(/\s+/).length;
         if (document.getElementById(`${prefix}_n_notcenter`).checked && !p.isC) return false;
         if (document.getElementById(`${prefix}_n_notbold`)?.checked && !p.isB) return false;
         if (document.getElementById(`${prefix}_n_long`).checked && words > parseInt(document.getElementById(`${prefix}_n_long_v`).value)) return false;
         if (document.getElementById(`${prefix}_n_contains`).checked && p.text.includes(document.getElementById(`${prefix}_n_contains_v`).value)) return false;
+        if (prefix === 'h1' && document.getElementById(`h1_n_seq`).checked) {
+            if (checkSeq(i, parseInt(document.getElementById('h1_n_seq_n').value), document.getElementById('h1_n_seq_t').value)) return false;
+        }
 
         if (document.getElementById(`${prefix}_p_center`).checked && p.isC) return true;
         if (document.getElementById(`${prefix}_p_bold`).checked && p.isB) return true;
         if (document.getElementById(`${prefix}_p_short`).checked && words < parseInt(document.getElementById(`${prefix}_p_short_v`).value)) return true;
         if (document.getElementById(`${prefix}_p_contains`).checked && p.text.includes(document.getElementById(`${prefix}_p_contains_v`).value)) return true;
+        if (prefix === 'h2' && document.getElementById(`h2_p_seq`).checked) {
+            if (checkSeq(i, parseInt(document.getElementById('h2_p_seq_n').value), document.getElementById('h2_p_seq_t').value)) return true;
+        }
         return false;
     }
 
@@ -135,7 +151,8 @@
 
     function exportDoc() {
         if (!zip) return;
-        const doc = new DOMParser().parseFromString(zip.file("word/document.xml").asText(), "application/xml");
+        const xmlString = zip.file("word/document.xml").asText();
+        const doc = new DOMParser().parseFromString(xmlString, "application/xml");
         const ps = Array.from(doc.getElementsByTagNameNS(ns, "p"));
         let idx = 0;
 
@@ -146,17 +163,14 @@
                     let pPr = p.getElementsByTagNameNS(ns, "pPr")[0] || doc.createElementNS(ns, "w:pPr");
                     if (!p.contains(pPr)) p.insertBefore(pPr, p.firstChild);
                     
-                    // 1. הזרקת הסטייל
+                    // הגדרת הסגנון באופן שוורד חייב לקרוא
                     let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0] || doc.createElementNS(ns, "w:pStyle");
-                    style.setAttributeNS(ns, "w:val", role === 'h1' ? "Heading1" : "Heading2");
+                    // ניסיון להגדיר את שני ה-IDs הנפוצים
+                    const styleVal = role === 'h1' ? "Heading1" : "Heading2";
+                    style.setAttributeNS(ns, "w:val", styleVal);
                     if (!pPr.contains(style)) pPr.appendChild(style);
 
-                    // 2. הזרקת ה-Outline Level (זה מה שגורם לוורד להבין שזו כותרת!)
-                    let outline = pPr.getElementsByTagNameNS(ns, "outlineLvl")[0] || doc.createElementNS(ns, "w:outlineLvl");
-                    outline.setAttributeNS(ns, "w:val", role === 'h1' ? "0" : "1");
-                    if (!pPr.contains(outline)) pPr.appendChild(outline);
-
-                    // 3. ניקוי עיצוב דורס
+                    // ניקוי עיצוב ידני שעלול לחסום את הסגנון
                     const jc = pPr.getElementsByTagNameNS(ns, "jc")[0];
                     if (jc) pPr.removeChild(jc);
                 }
