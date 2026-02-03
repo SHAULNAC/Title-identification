@@ -2,135 +2,201 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>מעמד הכותרות החכם</title>
+    <title>מעמד ספרים מקצועי - Preview</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.1/pizzip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    
     <style>
-        body { font-family: system-ui, sans-serif; margin: 40px; background: #f4f7f6; line-height: 1.6; }
-        .container { max-width: 600px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: auto; }
-        h1 { color: #2c3e50; text-align: center; }
-        .setting { margin-bottom: 20px; padding: 15px; border: 1px solid #eee; border-radius: 8px; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; }
-        input[type="text"], input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #219150; }
-        #status { margin-top: 20px; text-align: center; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; height: 100vh; background: #eef2f3; }
+        
+        /* תפריט צד */
+        .sidebar { width: 350px; background: #2c3e50; color: white; padding: 20px; overflow-y: auto; box-shadow: 2px 0 10px rgba(0,0,0,0.2); }
+        .sidebar h2 { border-bottom: 1px solid #555; padding-bottom: 10px; font-size: 1.2rem; }
+        .rule-group { background: #34495e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #456789; }
+        .rule-group h3 { margin-top: 0; font-size: 1rem; color: #1abc9c; }
+        
+        /* אזור תצוגה מקדימה */
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+        .preview-page { width: 100%; max-width: 800px; background: white; padding: 50px; box-shadow: 0 0 20px rgba(0,0,0,0.1); min-height: 1000px; border-radius: 4px; }
+        
+        /* עיצוב טקסט בתצוגה */
+        p { margin: 8px 0; border: 1px transparent solid; transition: 0.2s; }
+        .h1-preview { font-size: 2em; font-weight: bold; color: #2980b9; border: 1px dashed #2980b9; padding: 5px; display: block; }
+        .h2-preview { font-size: 1.5em; font-weight: bold; color: #c0392b; border: 1px dashed #c0392b; padding: 5px; display: block; }
+        
+        input[type="text"], input[type="number"], select { width: 100%; padding: 8px; margin: 5px 0; border-radius: 4px; border: none; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-primary { background: #1abc9c; color: white; }
+        .btn-download { background: #e67e22; color: white; margin-top: 20px; }
+        .checkbox-row { display: flex; align-items: center; gap: 10px; margin: 5px 0; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>מעמד כותרות אוטומטי</h1>
+<div class="sidebar">
+    <h2>הגדרות עימוד</h2>
     
-    <div class="setting">
-        <label>מילת מפתח לכותרת (למשל: סימן):</label>
-        <input type="text" id="keyword" value="סימן">
-    </div>
+    <input type="file" id="fileInput" accept=".docx" class="btn btn-primary">
+    
+    <div id="controls" style="display:none;">
+        <div class="rule-group" id="groupH1">
+            <h3>כותרת 1 (רמה גבוהה)</h3>
+            <div class="checkbox-row"><input type="checkbox" id="h1_keyword_check"> מתחיל במילה:</div>
+            <input type="text" id="h1_keyword_val" value="סימן">
+            
+            <div class="checkbox-row"><input type="checkbox" id="h1_double_check"> "סימן" כפול (ראשון מבין שניים)</div>
+        </div>
 
-    <div class="setting">
-        <label>מספר מילים מקסימלי לכותרת:</label>
-        <input type="number" id="maxWords" value="6">
-    </div>
+        <div class="rule-group" id="groupH2">
+            <h3>כותרת 2</h3>
+            <div class="checkbox-row"><input type="checkbox" id="h2_keyword_check" checked> מתחיל במילה:</div>
+            <input type="text" id="h2_keyword_val" value="סעיף">
+            
+            <div class="checkbox-row"><input type="checkbox" id="h2_words_check" checked> מקסימום מילים:</div>
+            <input type="number" id="h2_words_val" value="5">
 
-    <div class="setting">
-        <label>בחר קובץ Word (.docx):</label>
-        <input type="file" id="fileInput" accept=".docx">
-    </div>
+            <div class="checkbox-row"><input type="checkbox" id="h2_bold_check"> רק אם מודגש (Bold)</div>
+        </div>
 
-    <button onclick="processDocx()">עבד והורד קובץ מתוקן</button>
-    <div id="status"></div>
+        <div class="setting">
+            <label>לוגיקת שילוב:</label>
+            <select id="logicGate">
+                <option value="OR">מספיק תנאי אחד (OR)</option>
+                <option value="AND">כל התנאים חייבים להתקיים (AND)</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="updatePreview()">רענן תצוגה מקדימה</button>
+        <button class="btn btn-download" onclick="downloadModifiedDocx()">הורד קובץ מעובד</button>
+    </div>
+</div>
+
+<div class="main-content">
+    <div id="status">אנא בחר קובץ וורד כדי להתחיל</div>
+    <div class="preview-page" id="previewArea">
+        </div>
 </div>
 
 <script>
-    async function processDocx() {
-        const fileInput = document.getElementById('fileInput');
-        const keyword = document.getElementById('keyword').value;
-        const maxWords = parseInt(document.getElementById('maxWords').value);
-        const status = document.getElementById('status');
+    let originalDocZip = null;
+    let paragraphsData = []; // נשמור כאן את הטקסט והמאפיינים
 
-        if (!fileInput.files[0]) {
-            alert("אנא בחר קובץ");
-            return;
-        }
-
-        status.innerText = "מעבד...";
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = async function(e) {
-            try {
-                const content = e.target.result;
-                const zip = new PizZip(content);
-                const xmlString = zip.file("word/document.xml").asText();
-                
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlString, "application/xml");
-                const paragraphs = Array.from(xmlDoc.getElementsByTagName("w:p"));
-
-                for (let i = 0; i < paragraphs.length; i++) {
-                    const p = paragraphs[i];
-                    const text = p.textContent.trim();
-                    const words = text.split(/\s+/);
-
-                    let styleToApply = null;
-
-                    // לוגיקה: זיהוי רצף של מילת מפתח
-                    if (text.startsWith(keyword)) {
-                        const nextP = paragraphs[i + 1];
-                        const nextText = nextP ? nextP.textContent.trim() : "";
-
-                        if (nextText.startsWith(keyword)) {
-                            styleToApply = "Heading1";
-                            // נסמן גם את הבא בתור כ-Heading2 בלולאה הבאה
-                            paragraphs[i+1]._forceHeading2 = true; 
-                        } else if (p._forceHeading2) {
-                            styleToApply = "Heading2";
-                        } else {
-                            styleToApply = "Heading2";
-                        }
-                    } 
-                    // לוגיקה: מספר מילים
-                    else if (text.length > 0 && words.length <= maxWords) {
-                        styleToApply = "Heading3";
-                    }
-
-                    if (styleToApply) {
-                        applyStyleToParagraph(xmlDoc, p, styleToApply);
-                    }
-                }
-
-                // שמירה
-                const serializer = new XMLSerializer();
-                const newXmlString = serializer.serializeToString(xmlDoc);
-                zip.file("word/document.xml", newXmlString);
-                
-                const out = zip.generate({type:"blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
-                saveAs(out, "processed_" + fileInput.files[0].name);
-                status.innerText = "הסתיים בהצלחה!";
-
-            } catch (err) {
-                console.error(err);
-                status.innerText = "שגיאה בעיבוד הקובץ";
-            }
+        reader.onload = async (event) => {
+            originalDocZip = new PizZip(event.target.result);
+            parseDocx(originalDocZip);
+            document.getElementById('controls').style.display = 'block';
+            document.getElementById('status').innerText = "תצוגה מקדימה (חלקי):";
         };
-        reader.readAsArrayBuffer(fileInput.files[0]);
+        reader.readAsArrayBuffer(file);
+    });
+
+    function parseDocx(zip) {
+        const xmlString = zip.file("word/document.xml").asText();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+        const pTags = Array.from(xmlDoc.getElementsByTagName("w:p"));
+
+        paragraphsData = pTags.map(p => {
+            const text = p.textContent.trim();
+            const isBold = p.querySelector('w\\:b, b') !== null;
+            return { text, isBold, originalElement: p };
+        });
+
+        updatePreview();
     }
 
-    function applyStyleToParagraph(xmlDoc, p, styleName) {
-        let pPr = p.getElementsByTagName("w:pPr")[0];
-        if (!pPr) {
-            pPr = xmlDoc.createElementNS("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "w:pPr");
-            p.insertBefore(pPr, p.firstChild);
-        }
+    function updatePreview() {
+        const previewArea = document.getElementById('previewArea');
+        previewArea.innerHTML = '';
         
+        const h1_key_check = document.getElementById('h1_keyword_check').checked;
+        const h1_key_val = document.getElementById('h1_keyword_val').value;
+        const h1_double = document.getElementById('h1_double_check').checked;
+        
+        const h2_key_check = document.getElementById('h2_keyword_check').checked;
+        const h2_key_val = document.getElementById('h2_keyword_val').value;
+        const h2_words_check = document.getElementById('h2_words_check').checked;
+        const h2_words_val = parseInt(document.getElementById('h2_words_val').value);
+        const h2_bold_check = document.getElementById('h2_bold_check').checked;
+        
+        const gate = document.getElementById('logicGate').value;
+
+        paragraphsData.forEach((p, i) => {
+            if (!p.text) return;
+
+            let finalRole = null;
+
+            // בדיקת כותרת 1 (קדימות גבוהה)
+            let h1_match = false;
+            if (h1_key_check && p.text.startsWith(h1_key_val)) h1_match = true;
+            if (h1_double && p.text.startsWith(h1_key_val)) {
+                const nextP = paragraphsData[i+1];
+                if (nextP && nextP.text.startsWith(h1_key_val)) h1_match = true;
+            }
+
+            if (h1_match) {
+                finalRole = 'h1';
+            } else {
+                // בדיקת כותרת 2
+                let conditions = [];
+                if (h2_key_check) conditions.push(p.text.startsWith(h2_key_val));
+                if (h2_words_check) conditions.push(p.text.split(/\s+/).length <= h2_words_val);
+                if (h2_bold_check) conditions.push(p.isBold);
+
+                if (conditions.length > 0) {
+                    finalRole = (gate === "OR") 
+                        ? (conditions.some(c => c) ? 'h2' : null)
+                        : (conditions.every(c => c) ? 'h2' : null);
+                }
+            }
+
+            const pElem = document.createElement('p');
+            pElem.innerText = p.text;
+            if (finalRole === 'h1') pElem.className = 'h1-preview';
+            if (finalRole === 'h2') pElem.className = 'h2-preview';
+            previewArea.appendChild(pElem);
+            p.currentRole = finalRole; // שומרים להורדה
+        });
+    }
+
+    function applyStyleToXml(pTag, styleName) {
+        let pPr = pTag.getElementsByTagName("w:pPr")[0];
+        if (!pPr) {
+            pPr = pTag.ownerDocument.createElementNS("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "w:pPr");
+            pTag.insertBefore(pPr, pTag.firstChild);
+        }
         let pStyle = pPr.getElementsByTagName("w:pStyle")[0];
         if (!pStyle) {
-            pStyle = xmlDoc.createElementNS("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "w:pStyle");
-            pPr.insertBefore(pStyle, pPr.firstChild);
+            pStyle = pTag.ownerDocument.createElementNS("http://schemas.openxmlformats.org/wordprocessingml/2006/main", "w:pStyle");
+            pPr.appendChild(pStyle);
         }
         pStyle.setAttribute("w:val", styleName);
     }
-</script>
 
+    function downloadModifiedDocx() {
+        const xmlString = originalDocZip.file("word/document.xml").asText();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+        const pTags = xmlDoc.getElementsByTagName("w:p");
+
+        paragraphsData.forEach((pData, i) => {
+            if (pData.currentRole) {
+                const styleName = pData.currentRole === 'h1' ? "Heading1" : "Heading2";
+                applyStyleToXml(pTags[i], styleName);
+            }
+        });
+
+        const serializer = new XMLSerializer();
+        const newXmlString = serializer.serializeToString(xmlDoc);
+        originalDocZip.file("word/document.xml", newXmlString);
+        
+        const out = originalDocZip.generate({type:"blob"});
+        saveAs(out, "מעומד_חדש.docx");
+    }
+</script>
 </body>
 </html>
