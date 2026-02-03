@@ -8,39 +8,52 @@
     <style>
         :root { --bg: #0f172a; --panel: #1e293b; --accent: #fbbf24; --text: #f8fafc; --h1: #38bdf8; --h2: #f472b6; --red: #ef4444; --green: #22c55e; }
         body { font-family: 'Segoe UI', system-ui; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--text); overflow: hidden; }
-        .sidebar { width: 480px; background: var(--panel); padding: 20px; overflow-y: auto; border-left: 1px solid #334155; }
-        .header-section { background: rgba(255,255,255,0.02); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid #475569; }
-        .rule-group { margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 0.85rem; }
-        .neg-group { background: rgba(239, 68, 68, 0.08); border: 1px solid var(--red); margin-bottom: 10px; }
+        
+        /* סרגל צד מעודכן - קומפקטי יותר */
+        .sidebar { width: 400px; background: var(--panel); padding: 15px; overflow-y: auto; border-left: 1px solid #334155; }
+        .header-section { background: rgba(255,255,255,0.02); border-radius: 10px; padding: 10px; margin-bottom: 15px; border: 1px solid #475569; }
+        .rule-group { margin-top: 8px; padding: 8px; border-radius: 6px; font-size: 0.8rem; }
+        .neg-group { background: rgba(239, 68, 68, 0.08); border: 1px solid var(--red); margin-bottom: 8px; }
         .pos-group { background: rgba(34, 197, 94, 0.08); border: 1px solid var(--green); }
-        .rule-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-        .rule-item input[type="text"], .rule-item input[type="number"] { background: #0f172a; border: 1px solid #475569; color: white; border-radius: 4px; padding: 2px 5px; width: 45px; }
-        .viewport { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; background: #020617; }
-        .paper { background: white; color: #1e293b; width: 100%; max-width: 800px; min-height: 100%; padding: 60px; box-sizing: border-box; text-align: justify; }
-        .h1-style { font-size: 2rem; font-weight: 900; color: #0369a1; text-align: center !important; border-bottom: 3px double #0369a1; margin: 30px 0; }
-        .h2-style { font-size: 1.5rem; font-weight: 800; color: #be185d; text-align: center !important; border-bottom: 2px dashed #be185d; margin: 20px 0; }
-        .btn-gold { background: linear-gradient(135deg, #fbbf24, #d97706); color: black; width: 100%; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        #status-bar { padding: 8px; border-radius: 6px; text-align: center; margin-bottom: 10px; font-weight: bold; font-size: 0.8rem; }
+        .rule-item { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .rule-item input[type="text"], .rule-item input[type="number"] { background: #0f172a; border: 1px solid #475569; color: white; border-radius: 4px; padding: 1px 4px; width: 40px; }
+        
+        /* אזור התצוגה והנייר */
+        .viewport { flex: 1; overflow-y: auto; padding: 40px; background: #020617; display: block; }
+        .paper { background: white; color: #1e293b; width: 100%; max-width: 800px; min-height: 100%; padding: 60px; box-sizing: border-box; text-align: justify; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        
+        /* עיצוב פסקאות בתצוגה המקדימה */
+        .p-view { margin-bottom: 10px; line-height: 1.5; }
+        .is-bold { font-weight: bold; }
+        .is-centered { text-align: center; }
+        
+        .h1-style { font-size: 2rem; font-weight: 900; color: #0369a1; text-align: center !important; border-bottom: 3px double #0369a1; margin: 25px 0; }
+        .h2-style { font-size: 1.5rem; font-weight: 800; color: #be185d; text-align: center !important; border-bottom: 2px dashed #be185d; margin: 15px 0; }
+        
+        .btn-gold { background: linear-gradient(135deg, #fbbf24, #d97706); color: black; width: 100%; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-kofi { display: block; text-align: center; background: #29abe0; color: white; text-decoration: none; padding: 8px; border-radius: 8px; font-size: 0.85rem; margin-top: 15px; font-weight: bold; }
+        
+        #status-bar { padding: 6px; border-radius: 6px; text-align: center; margin-bottom: 10px; font-weight: bold; font-size: 0.75rem; }
         .ready { background: #22c55e22; color: #4ade80; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2>PLATINUM LOGIC v20</h2>
+    <h2 style="font-size: 1.2rem; margin-top: 0;">PLATINUM LOGIC v20</h2>
     <div id="status-bar">טוען...</div>
-    <input type="file" id="fileIn" accept=".docx" style="margin-bottom:15px; width:100%;">
+    <input type="file" id="fileIn" accept=".docx" style="margin-bottom:15px; width:100%; font-size: 0.8rem;">
 
     <div id="ui" style="display:none;">
         <div class="header-section">
-            <h3 style="color:var(--h1); margin:0;">כותרת 1 (H1)</h3>
+            <h3 style="color:var(--h1); margin:0; font-size: 1rem;">כותרת 1 (H1)</h3>
             <div class="rule-group neg-group">
                 <b>שלילה:</b>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notcenter"> <span>אי מירכוז</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notbold"> <span>לא מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h1_n_long_v" value="10"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_n_contains_v" value="."></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי X פסקאות שמתחילות ב-X</span> <input type="number" class="live" id="h1_n_seq_n" value="1" style="width:30px"> <input type="text" class="live" id="h1_n_seq_t" value="סימן" style="width:60px"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי X פסקאות שמתחילות ב-X</span> <input type="number" class="live" id="h1_n_seq_n" value="1" style="width:25px"> <input type="text" class="live" id="h1_n_seq_t" value="סימן" style="width:50px"></div>
             </div>
             <div class="rule-group pos-group">
                 <b>חיוב:</b>
@@ -52,7 +65,7 @@
         </div>
 
         <div class="header-section">
-            <h3 style="color:var(--h2); margin:0;">כותרת 2 (H2)</h3>
+            <h3 style="color:var(--h2); margin:0; font-size: 1rem;">כותרת 2 (H2)</h3>
             <div class="rule-group neg-group">
                 <b>שלילה:</b>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_n_notcenter"> <span>אי מירכוז</span></div>
@@ -66,15 +79,18 @@
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_bold"> <span>הדגשה</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h2_p_short_v" value="8"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_contains"> <span>מכיל X:</span> <input type="text" class="live" id="h2_p_contains_v" value="סימן"></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_seq"> <span>פסקה אחרי X שמתחילות ב-X</span> <input type="number" class="live" id="h2_p_seq_n" value="1" style="width:30px"> <input type="text" class="live" id="h2_p_seq_t" value="סימן" style="width:60px"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_seq"> <span>פסקה אחרי X שמתחילות ב-X</span> <input type="number" class="live" id="h2_p_seq_n" value="1" style="width:25px"> <input type="text" class="live" id="h2_p_seq_t" value="סימן" style="width:50px"></div>
             </div>
         </div>
 
         <button class="btn-gold" onclick="exportDoc()">הורד מסמך מעומד סופי</button>
+        <a href="https://ko-fi.com/shaulnac" target="_blank" class="btn-kofi">תמיכה בפיתוח (Ko-fi) ❤️</a>
     </div>
 </div>
 
-<div class="viewport"><div class="paper" id="out"></div></div>
+<div class="viewport">
+    <div class="paper" id="out"></div>
+</div>
 
 <script>
     let zip = null, paragraphs = [], originalFileName = "document";
@@ -123,6 +139,7 @@
         paragraphs.forEach((p, i) => {
             p.role = evaluateLogic(p, i, 'h1') ? 'h1' : (evaluateLogic(p, i, 'h2') ? 'h2' : null);
             const d = document.createElement('div');
+            // כאן נוספו המחלקות is-bold ו-is-centered
             d.className = 'p-view ' + (p.role ? p.role + '-style' : '') + (p.isB ? ' is-bold' : '') + (p.isC ? ' is-centered' : '');
             d.innerText = p.text;
             out.appendChild(d);
@@ -151,7 +168,6 @@
     function exportDoc() {
         if (!zip) return;
         
-        // יצירת קובץ Styles דמה כדי להכריח את וורד ווב להכיר את הכותרות
         const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
             <w:style w:type="paragraph" w:styleId="Heading1">
@@ -181,7 +197,6 @@
                     let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0] || doc.createElementNS(ns, "w:pStyle");
                     style.setAttributeNS(ns, "w:val", role === 'h1' ? "Heading1" : "Heading2");
                     if (!pPr.contains(style)) pPr.appendChild(style);
-                    // ניקוי מירכוז ידני
                     const jc = pPr.getElementsByTagNameNS(ns, "jc")[0];
                     if (jc) pPr.removeChild(jc);
                 }
