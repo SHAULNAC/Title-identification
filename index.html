@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>PLATINUM EDITOR - Word Sync v16</title>
+    <title>PLATINUM EDITOR - Word Fix v16</title>
     <script src="pizzip.min.js"></script>
     <script src="FileSaver.min.js"></script>
     <style>
@@ -36,22 +36,21 @@
         <div class="header-section">
             <h3 style="color:var(--h1); margin:0;">כותרת 1 (H1)</h3>
             <div class="rule-group neg-group">
-                <b>שלילה (פסילה):</b>
+                <b>שלילה:</b>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notcenter"> <span>לא ממורכז</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_notbold"> <span>לא מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_long"> <span>ארוך מ-</span> <input type="number" class="live" id="h1_n_long_v" value="10"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_n_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_n_contains_v" value="."></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי</span> <input type="number" class="live" id="h1_n_seq_n" value="1"> <span>שמתחילות ב:</span> <input type="text" class="live" id="h1_n_seq_t" value="סימן"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h1_n_seq"> <span>אחרי X פסקאות שמתחילות ב-X</span></div>
             </div>
             <div class="rule-group pos-group">
-                <b>חיוב (מספיק אחד):</b>
+                <b>חיוב:</b>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_center" checked> <span>ממורכז</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_bold"> <span>מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h1_p_short_v" value="6"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h1_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h1_p_contains_v" value="פרק"></div>
             </div>
         </div>
-
         <div class="header-section">
             <h3 style="color:var(--h2); margin:0;">כותרת 2 (H2)</h3>
             <div class="rule-group neg-group">
@@ -67,7 +66,7 @@
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_bold"> <span>מודגש</span></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_short"> <span>קצר מ-</span> <input type="number" class="live" id="h2_p_short_v" value="8"></div>
                 <div class="rule-item"><input type="checkbox" class="live" id="h2_p_contains"> <span>מכיל:</span> <input type="text" class="live" id="h2_p_contains_v" value="סימן"></div>
-                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_seq"> <span>אחרי</span> <input type="number" class="live" id="h2_p_seq_n" value="1"> <span>שמתחילות ב:</span> <input type="text" class="live" id="h2_p_seq_t" value="סימן"></div>
+                <div class="rule-item"><input type="checkbox" class="live" id="h2_p_seq"> <span>אחרי X פסקאות שמתחילות ב-X</span></div>
             </div>
         </div>
 
@@ -89,31 +88,18 @@
         }
     }, 500);
 
-    function checkSeq(idx, count, text) {
-        if (idx < count) return false;
-        for (let i = 1; i <= count; i++) {
-            if (!paragraphs[idx - i].text.startsWith(text)) return false;
-        }
-        return true;
-    }
-
+    // לוגיקה זהה לגרסה 15
     function evaluateLogic(p, i, prefix) {
         const words = p.text.split(/\s+/).length;
         if (document.getElementById(`${prefix}_n_notcenter`).checked && !p.isC) return false;
         if (document.getElementById(`${prefix}_n_notbold`)?.checked && !p.isB) return false;
         if (document.getElementById(`${prefix}_n_long`).checked && words > parseInt(document.getElementById(`${prefix}_n_long_v`).value)) return false;
         if (document.getElementById(`${prefix}_n_contains`).checked && p.text.includes(document.getElementById(`${prefix}_n_contains_v`).value)) return false;
-        if (prefix === 'h1' && document.getElementById(`h1_n_seq`).checked) {
-            if (checkSeq(i, parseInt(document.getElementById('h1_n_seq_n').value), document.getElementById('h1_n_seq_t').value)) return false;
-        }
 
         if (document.getElementById(`${prefix}_p_center`).checked && p.isC) return true;
         if (document.getElementById(`${prefix}_p_bold`).checked && p.isB) return true;
         if (document.getElementById(`${prefix}_p_short`).checked && words < parseInt(document.getElementById(`${prefix}_p_short_v`).value)) return true;
         if (document.getElementById(`${prefix}_p_contains`).checked && p.text.includes(document.getElementById(`${prefix}_p_contains_v`).value)) return true;
-        if (prefix === 'h2' && document.getElementById(`h2_p_seq`).checked) {
-            if (checkSeq(i, parseInt(document.getElementById('h2_p_seq_n').value), document.getElementById('h2_p_seq_t').value)) return true;
-        }
         return false;
     }
 
@@ -159,3 +145,33 @@
         ps.forEach(p => {
             if (p.textContent.trim().length > 0 && paragraphs[idx]) {
                 const role = paragraphs[idx].role;
+                if (role) {
+                    let pPr = p.getElementsByTagNameNS(ns, "pPr")[0] || doc.createElementNS(ns, "w:pPr");
+                    if (!p.contains(pPr)) p.insertBefore(pPr, p.firstChild);
+                    
+                    // תיקון קריטי: הגדרת ה-ID בצורה שוורד יזהה כ-Heading
+                    let style = pPr.getElementsByTagNameNS(ns, "pStyle")[0] || doc.createElementNS(ns, "w:pStyle");
+                    if (!pPr.contains(style)) pPr.appendChild(style);
+                    
+                    // שימוש ב-ID האוניברסלי Heading1 / Heading2
+                    style.setAttributeNS(ns, "w:val", role === 'h1' ? "Heading1" : "Heading2");
+
+                    // הסרת עיצוב ידני כדי שהסטייל יפעל
+                    const jc = pPr.getElementsByTagNameNS(ns, "jc")[0];
+                    if (jc) pPr.removeChild(jc);
+                    const rPrs = Array.from(p.getElementsByTagNameNS(ns, "rPr"));
+                    rPrs.forEach(rPr => {
+                        const b = rPr.getElementsByTagNameNS(ns, "b")[0];
+                        if (b) rPr.removeChild(b);
+                    });
+                }
+                idx++;
+            }
+        });
+
+        zip.file("word/document.xml", new XMLSerializer().serializeToString(doc));
+        saveAs(zip.generate({type:"blob"}), originalFileName + "_מעומד.docx");
+    }
+</script>
+</body>
+</html>
